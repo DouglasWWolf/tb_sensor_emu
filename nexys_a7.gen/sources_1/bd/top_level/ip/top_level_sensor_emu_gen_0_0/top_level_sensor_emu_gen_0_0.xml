@@ -286,39 +286,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>dbg_cycle_number</spirit:name>
-        <spirit:wire>
-          <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long">31</spirit:left>
-            <spirit:right spirit:format="long">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>std_logic_vector</spirit:typeName>
-              <spirit:viewNameRef>dummy_view</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-        </spirit:wire>
-      </spirit:port>
-      <spirit:port>
-        <spirit:name>dbg_fsm_state</spirit:name>
-        <spirit:wire>
-          <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long">5</spirit:left>
-            <spirit:right spirit:format="long">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>std_logic_vector</spirit:typeName>
-              <spirit:viewNameRef>dummy_view</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-        </spirit:wire>
-      </spirit:port>
-      <spirit:port>
-        <spirit:name>ENABLE</spirit:name>
+        <spirit:name>enable</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
@@ -330,7 +298,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>RS0</spirit:name>
+        <spirit:name>rs0</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
@@ -342,7 +310,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>RS256</spirit:name>
+        <spirit:name>rs256</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
@@ -354,7 +322,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>CYCLES_PER_FRAME</spirit:name>
+        <spirit:name>cycles_per_frame</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -370,7 +338,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>IDLE_0</spirit:name>
+        <spirit:name>idle_0</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -386,7 +354,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>IDLE_1</spirit:name>
+        <spirit:name>idle_1</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -402,7 +370,23 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>PA_SYNC</spirit:name>
+        <spirit:name>frame_header</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>dummy_view</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>pa_sync</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:wireTypeDefs>
@@ -414,7 +398,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>LVDS</spirit:name>
+        <spirit:name>lvds</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
@@ -430,7 +414,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>SOF</spirit:name>
+        <spirit:name>sof</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:wireTypeDefs>
@@ -442,7 +426,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>EOF</spirit:name>
+        <spirit:name>eof</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:wireTypeDefs>
@@ -511,7 +495,7 @@
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>SYNC_PULSE_LENGTH</spirit:name>
         <spirit:displayName>Sync Pulse Length</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.SYNC_PULSE_LENGTH">16</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.SYNC_PULSE_LENGTH">4</spirit:value>
       </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
@@ -537,7 +521,7 @@
     <spirit:parameter>
       <spirit:name>SYNC_PULSE_LENGTH</spirit:name>
       <spirit:displayName>Sync Pulse Length</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.SYNC_PULSE_LENGTH">16</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.SYNC_PULSE_LENGTH">4</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>

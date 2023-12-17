@@ -15,34 +15,34 @@ module sensor_emu_gen #
 (
     PATTERN_WIDTH      = 32,
     LVDS_WIDTH         = 512,
-    SYNC_PULSE_LENGTH  = 16
+    SYNC_PULSE_LENGTH  = 4
 )
 (
     input clk, resetn,
 
-    output[31:0] dbg_cycle_number, 
-    output[5:0]  dbg_fsm_state,
-
     // We output our sync pulse only when this is high
-    input ENABLE,
+    input enable,
 
     // These both signal "start outputting a frame"
-    input RS0, RS256,
+    input rs0, rs256,
 
     // The number of clock cycles per data-frame.  Must be even and at least 4
-    input[31:0] CYCLES_PER_FRAME,
+    input[31:0] cycles_per_frame,
 
     // The bytes that are output during the idle pattern
-    input[7:0] IDLE_0, IDLE_1,
+    input[7:0] idle_0, idle_1,
+
+    // The first four bytes of a frame header
+    input[31:0] frame_header,
 
     // A sync pulse with a period of 256 clock cycles
-    output PA_SYNC,
+    output pa_sync,
 
     // The LVDS lines are the primary output of this module
-    output[LVDS_WIDTH-1:0] LVDS,
+    output[LVDS_WIDTH-1:0] lvds,
 
     // Denotes start-of-frame and end-of-frame
-    output SOF, EOF,
+    output sof, eof,
 
     //==================  The stream of input bit-patterns  ====================
     input[PATTERN_WIDTH-1:0] PATTERN_TDATA,
@@ -56,7 +56,7 @@ module sensor_emu_gen #
 localparam PATTERN_REPS = LVDS_WIDTH / PATTERN_WIDTH;
 
 // This is the current cell-data pattern being output on LVDS
-reg[PATTERN_WIDTH-1:0] pattern_tdata;
+reg[LVDS_WIDTH-1:0] pattern_data;
 
 //==========================================================================
 // This is a free-running timer
@@ -71,10 +71,10 @@ end
 //==========================================================================
 
 // Our sync pulse goes out periodically
-assign PA_SYNC = (ENABLE & free_timer < SYNC_PULSE_LENGTH);
+assign pa_sync = (enable & free_timer < SYNC_PULSE_LENGTH);
 
 // We only look for "begin outputting a frame" when the free-timer is 0 ot 1
-wire frame_trigger = (RS0 | RS256) & (free_timer < 2);
+wire frame_trigger = (rs0 | rs256) & (free_timer < 2);
 
 // The state of our main state machine
 reg[5:0] fsm_state;
@@ -86,16 +86,19 @@ localparam FSM_FRAME_DC  = 16;
 localparam FSM_FRAME_LC  = 32;
 
 // Provide "start of frame" and "end of frame" markers to ease debugging
-assign SOF = (fsm_state == FSM_FRAME_FC);
-assign EOF = (fsm_state == FSM_FRAME_LC);
+assign sof = (fsm_state == FSM_FRAME_FC);
+assign eof = (fsm_state == FSM_FRAME_LC);
+
+// This is the data-pattern that represents cell data in the frame
+reg[LVDS_WIDTH-1:0] cell_data;
 
 // The data on the LVDS lines depends on what state we're in
-assign LVDS =
-    (fsm_state == FSM_IDLE0   ) ? {64{IDLE_0}}                  :
-    (fsm_state == FSM_IDLE1   ) ? {64{IDLE_1}}                  :
-    (fsm_state == FSM_FRAME_FC) ? {PATTERN_REPS{pattern_tdata}} :
-    (fsm_state == FSM_FRAME_DC) ? {PATTERN_REPS{pattern_tdata}} :
-    (fsm_state == FSM_FRAME_LC) ? {PATTERN_REPS{pattern_tdata}} : 0;
+assign lvds =
+    (fsm_state == FSM_IDLE0   ) ? {64{idle_0}}                     :
+    (fsm_state == FSM_IDLE1   ) ? {64{idle_1}}                     :
+    (fsm_state == FSM_FRAME_FC) ? {frame_header, cell_data[479:0]} :
+    (fsm_state == FSM_FRAME_DC) ? cell_data                        :
+    (fsm_state == FSM_FRAME_LC) ? {cell_data[511:32], 32'h0}       : 0;
 
 
 //==========================================================================
@@ -113,9 +116,9 @@ always @(posedge clk) begin
     // If we see a valid frame trigger
     if ((fsm_state == FSM_IDLE1 || fsm_state == FSM_FRAME_LC)) begin
         if (frame_trigger) begin
-            cycle_number   <= 1;             // Cycle number starts over
-            pattern_tdata  <= PATTERN_TDATA; // Save the current data-pattern 
+            cell_data      <= {PATTERN_REPS{PATTERN_TDATA}}; 
             PATTERN_TREADY <= 1;             // Advance to the next pattern 
+            cycle_number   <= 1;             // Cycle number starts over            
         end
     end
 
@@ -153,7 +156,7 @@ always @(posedge clk) begin
         
         // Are we outputting a frame's ordinary data cycle?
         FSM_FRAME_DC:
-            if (cycle_number == CYCLES_PER_FRAME-1) begin
+            if (cycle_number == cycles_per_frame-1) begin
                 fsm_state  <= FSM_FRAME_LC;
             end
 
@@ -167,9 +170,6 @@ always @(posedge clk) begin
     endcase
 end
 //==========================================================================
-
-assign dbg_cycle_number = cycle_number; 
-assign dbg_fsm_state    = fsm_state;;
 
 
 endmodule

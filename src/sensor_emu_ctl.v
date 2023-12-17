@@ -68,10 +68,13 @@ module sensor_emu_ctl #
 
 
     // The number of clock cycles in a frame
-    output reg[31:0] CYCLES_PER_FRAME,
+    output reg[31:0] cycles_per_frame,
+
+    // The first 32-bits of a frame header
+    output reg[31:0] frame_header,
 
     // The two values that are output during "idle" cycles
-    output reg[7:0] IDLE_0, IDLE_1
+    output reg[7:0] idle_0, idle_1
 );  
 
     // Any time the register map of this module changes, this number should be bumped
@@ -93,6 +96,7 @@ module sensor_emu_ctl #
 
     localparam REG_CYCLES_PER_FRAME = 5;  /*  R/W  */
     localparam REG_IDLE_VALUES  = 6;      /*  R/W  */
+    localparam REG_FRAME_HEADER = 7;      /*  R/W  */
 
     localparam REG_INPUT_00 = 16;         /*  R/W  */
     localparam REG_INPUT_01 = 17;         /*  R/W  */
@@ -149,9 +153,12 @@ module sensor_emu_ctl #
     // (128 bytes is 32 32-bit registers)
     localparam ADDR_MASK = 7'h7F;
 
-    // Coming out of reset, these are the default value of CYCLES_PER_FRAME
+    // Coming out of reset, these are default values for some important parameters
     localparam DEFAULT_CYCLES_PER_FRAME = 32'h0001_0000;
-    
+    localparam DEFAULT_FRAME_HEADER     = 32'hA1B2_C3D4;
+    localparam DEFAULT_IDLE_0           = 8'hFA;
+    localparam DEFAULT_IDLE_1           = 8'hFB;
+
     // When one of these counters is non-zero, the associated FIFO is held in reset
     reg[3:0] f0_reset_counter, f1_reset_counter;
 
@@ -207,7 +214,7 @@ module sensor_emu_ctl #
     //   fifo_load_strobe
     //   input_value
     //   fifo_on_deck   
-    //   CYCLES_PER_FRAME
+    //   cycles_per_frame
     //==========================================================================
     always @(posedge clk) begin
 
@@ -226,9 +233,10 @@ module sensor_emu_ctl #
             f0_count         <= 0;
             f1_count         <= 0;
             fifo_on_deck     <= 0;
-            CYCLES_PER_FRAME <= DEFAULT_CYCLES_PER_FRAME;
-            IDLE_0           <= 8'hAA;
-            IDLE_1           <= 8'hBB;
+            cycles_per_frame <= DEFAULT_CYCLES_PER_FRAME;
+            frame_header     <= DEFAULT_FRAME_HEADER;
+            idle_0           <= DEFAULT_IDLE_0;
+            idle_1           <= DEFAULT_IDLE_1;
 
         // If we're not in reset, and a write-request has occured...        
         end else case (ashi_write_state)
@@ -305,14 +313,20 @@ module sensor_emu_ctl #
 
                     // Allow the user to configure the number of data-cycles per packet
                     REG_CYCLES_PER_FRAME:
-                        if (ashi_wdata && ~active_fifo) CYCLES_PER_FRAME <= ashi_wdata;
+                        if (ashi_wdata && ~active_fifo) cycles_per_frame <= ashi_wdata;
 
                     // Allow the user to configure the two idle-cycle bytes
                     REG_IDLE_VALUES:
                         if (~active_fifo) begin
-                            IDLE_0 <= ashi_wdata[15:8];
-                            IDLE_1 <= ashi_wdata[ 7:0];
+                            idle_0 <= ashi_wdata[15:8];
+                            idle_1 <= ashi_wdata[ 7:0];
                         end                    
+                    
+                    // Allow the user to configure the first 32-bit word of the frame header
+                    REG_FRAME_HEADER:
+                        if (~active_fifo) begin
+                            frame_header <= ashi_wdata;
+                        end
 
                     // Allow the user to store values into the "input" field
                     REG_INPUT_00:  input_value[ 0 * 32 +: 32] <= ashi_wdata;
@@ -374,8 +388,9 @@ module sensor_emu_ctl #
                 REG_LOAD_F0:          ashi_rdata <= f0_count;
                 REG_LOAD_F1:          ashi_rdata <= f1_count;
                 REG_START:            ashi_rdata <= active_fifo;
-                REG_CYCLES_PER_FRAME: ashi_rdata <= CYCLES_PER_FRAME;
-                REG_IDLE_VALUES:      ashi_rdata <= (IDLE_0 << 8) | IDLE_1;
+                REG_CYCLES_PER_FRAME: ashi_rdata <= cycles_per_frame;
+                REG_IDLE_VALUES:      ashi_rdata <= (idle_0 << 8) | idle_1;
+                REG_FRAME_HEADER:     ashi_rdata <= frame_header;
                 REG_INPUT_00:         ashi_rdata <= input_value[ 0 * 32 +: 32];
                 REG_INPUT_01:         ashi_rdata <= input_value[ 1 * 32 +: 32];
                 REG_INPUT_02:         ashi_rdata <= input_value[ 2 * 32 +: 32];

@@ -7,7 +7,8 @@
       "name": "top_level",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2021.1"
+      "tool_version": "2021.1",
+      "validated": "true"
     },
     "design_tree": {
       "system_interconnect": "",
@@ -20,7 +21,6 @@
         "axi_uart_bridge": ""
       },
       "sensor_emulator": {
-        "system_ila_0": "",
         "sensor_emu_ctl": "",
         "frame_generator": ""
       },
@@ -41,12 +41,42 @@
         "parameters": {
           "ASSOCIATED_RESET": {
             "value": "CPU_RESETN"
+          },
+          "CLK_DOMAIN": {
+            "value": "top_level_CLK100MHZ",
+            "value_src": "default"
+          },
+          "FREQ_HZ": {
+            "value": "100000000",
+            "value_src": "default"
+          },
+          "FREQ_TOLERANCE_HZ": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "PHASE": {
+            "value": "0.0",
+            "value_src": "default"
           }
         }
       },
       "CPU_RESETN": {
         "type": "rst",
-        "direction": "I"
+        "direction": "I",
+        "parameters": {
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "POLARITY": {
+            "value": "ACTIVE_LOW",
+            "value_src": "default"
+          }
+        }
       }
     },
     "components": {
@@ -832,49 +862,28 @@
             "type": "clk",
             "direction": "I"
           },
-          "RS256": {
+          "rs256": {
             "direction": "I"
           },
-          "PA_SYNC": {
+          "pa_sync": {
             "direction": "O"
           },
-          "LVDS": {
+          "lvds": {
             "direction": "O",
             "left": "511",
             "right": "0"
           },
-          "RS0": {
+          "rs0": {
             "direction": "I"
+          },
+          "sof": {
+            "direction": "O"
+          },
+          "eof": {
+            "direction": "O"
           }
         },
         "components": {
-          "system_ila_0": {
-            "vlnv": "xilinx.com:ip:system_ila:1.1",
-            "xci_name": "top_level_system_ila_0_2",
-            "xci_path": "ip/top_level_system_ila_0_2/top_level_system_ila_0_2.xci",
-            "inst_hier_path": "sensor_emulator/system_ila_0",
-            "parameters": {
-              "C_DATA_DEPTH": {
-                "value": "2048"
-              },
-              "C_MON_TYPE": {
-                "value": "MIX"
-              },
-              "C_NUM_OF_PROBES": {
-                "value": "8"
-              },
-              "C_SLOT_0_INTF_TYPE": {
-                "value": "xilinx.com:interface:axis_rtl:1.0"
-              }
-            },
-            "interface_ports": {
-              "SLOT_0_AXIS": {
-                "mode": "Monitor",
-                "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
-                "vlnv": "xilinx.com:interface:axis_rtl:1.0"
-              }
-            }
-          },
           "sensor_emu_ctl": {
             "vlnv": "xilinx.com:module_ref:sensor_emu_ctl:1.0",
             "xci_name": "top_level_sensor_emu_ctl_0_0",
@@ -1209,17 +1218,22 @@
               "enable": {
                 "direction": "O"
               },
-              "CYCLES_PER_FRAME": {
+              "cycles_per_frame": {
                 "direction": "O",
                 "left": "31",
                 "right": "0"
               },
-              "IDLE_0": {
+              "frame_header": {
+                "direction": "O",
+                "left": "31",
+                "right": "0"
+              },
+              "idle_0": {
                 "direction": "O",
                 "left": "7",
                 "right": "0"
               },
-              "IDLE_1": {
+              "idle_1": {
                 "direction": "O",
                 "left": "7",
                 "right": "0"
@@ -1342,52 +1356,47 @@
                   }
                 }
               },
-              "dbg_cycle_number": {
-                "direction": "O",
-                "left": "31",
-                "right": "0"
-              },
-              "dbg_fsm_state": {
-                "direction": "O",
-                "left": "5",
-                "right": "0"
-              },
-              "ENABLE": {
+              "enable": {
                 "direction": "I"
               },
-              "RS0": {
+              "rs0": {
                 "direction": "I"
               },
-              "RS256": {
+              "rs256": {
                 "direction": "I"
               },
-              "CYCLES_PER_FRAME": {
+              "cycles_per_frame": {
                 "direction": "I",
                 "left": "31",
                 "right": "0"
               },
-              "IDLE_0": {
+              "idle_0": {
                 "direction": "I",
                 "left": "7",
                 "right": "0"
               },
-              "IDLE_1": {
+              "idle_1": {
                 "direction": "I",
                 "left": "7",
                 "right": "0"
               },
-              "PA_SYNC": {
+              "frame_header": {
+                "direction": "I",
+                "left": "31",
+                "right": "0"
+              },
+              "pa_sync": {
                 "direction": "O"
               },
-              "LVDS": {
+              "lvds": {
                 "direction": "O",
                 "left": "511",
                 "right": "0"
               },
-              "SOF": {
+              "sof": {
                 "direction": "O"
               },
-              "EOF": {
+              "eof": {
                 "direction": "O"
               }
             }
@@ -1403,102 +1412,89 @@
           "PATTERN": {
             "interface_ports": [
               "sensor_emu_ctl/AXIS_OUT",
-              "frame_generator/PATTERN",
-              "system_ila_0/SLOT_0_AXIS"
+              "frame_generator/PATTERN"
             ]
           }
         },
         "nets": {
           "CYCLES_PER_FRAME": {
             "ports": [
-              "sensor_emu_ctl/CYCLES_PER_FRAME",
-              "system_ila_0/probe5",
-              "frame_generator/CYCLES_PER_FRAME"
-            ]
-          },
-          "EOF": {
-            "ports": [
-              "frame_generator/EOF",
-              "system_ila_0/probe4"
+              "sensor_emu_ctl/cycles_per_frame",
+              "frame_generator/cycles_per_frame"
             ]
           },
           "LVDS": {
             "ports": [
-              "frame_generator/LVDS",
-              "LVDS",
-              "system_ila_0/probe2"
+              "frame_generator/lvds",
+              "lvds"
             ]
           },
           "PA_SYNC": {
             "ports": [
-              "frame_generator/PA_SYNC",
-              "PA_SYNC",
-              "system_ila_0/probe1"
+              "frame_generator/pa_sync",
+              "pa_sync"
             ]
           },
           "RS0": {
             "ports": [
-              "RS0",
-              "system_ila_0/probe0",
-              "frame_generator/RS0"
+              "rs0",
+              "frame_generator/rs0"
             ]
           },
           "RS256": {
             "ports": [
-              "RS256",
-              "frame_generator/RS256"
-            ]
-          },
-          "SOF": {
-            "ports": [
-              "frame_generator/SOF",
-              "system_ila_0/probe3"
+              "rs256",
+              "frame_generator/rs256"
             ]
           },
           "clk_1": {
             "ports": [
               "clk",
-              "system_ila_0/clk",
               "sensor_emu_ctl/clk",
               "frame_generator/clk"
             ]
           },
-          "cycle_number": {
+          "frame_generator_EOF": {
             "ports": [
-              "frame_generator/dbg_cycle_number",
-              "system_ila_0/probe7"
+              "frame_generator/eof",
+              "eof"
             ]
           },
-          "fsm_state": {
+          "frame_generator_SOF": {
             "ports": [
-              "frame_generator/dbg_fsm_state",
-              "system_ila_0/probe6"
+              "frame_generator/sof",
+              "sof"
             ]
           },
           "resetn_1": {
             "ports": [
               "resetn",
-              "system_ila_0/resetn",
               "sensor_emu_ctl/resetn",
               "frame_generator/resetn"
             ]
           },
           "sensor_emu_ctl_IDLE_0": {
             "ports": [
-              "sensor_emu_ctl/IDLE_0",
-              "frame_generator/IDLE_0"
+              "sensor_emu_ctl/idle_0",
+              "frame_generator/idle_0"
             ]
           },
           "sensor_emu_ctl_IDLE_1": {
             "ports": [
-              "sensor_emu_ctl/IDLE_1",
-              "frame_generator/IDLE_1"
+              "sensor_emu_ctl/idle_1",
+              "frame_generator/idle_1"
             ]
           },
           "sensor_emu_ctl_enable": {
             "ports": [
               "sensor_emu_ctl/enable",
-              "frame_generator/ENABLE"
+              "frame_generator/enable"
+            ]
+          },
+          "sensor_emu_ctl_frame_header": {
+            "ports": [
+              "sensor_emu_ctl/frame_header",
+              "frame_generator/frame_header"
             ]
           }
         }
@@ -1796,7 +1792,7 @@
             "value": "NATIVE"
           },
           "C_NUM_OF_PROBES": {
-            "value": "4"
+            "value": "6"
           },
           "C_SLOT_0_INTF_TYPE": {
             "value": "xilinx.com:interface:axis_rtl:1.0"
@@ -1843,16 +1839,22 @@
           "source_50mhz/CPU_RESETN"
         ]
       },
+      "EOF": {
+        "ports": [
+          "sensor_emulator/eof",
+          "system_ila/probe5"
+        ]
+      },
       "LVDS": {
         "ports": [
-          "sensor_emulator/LVDS",
+          "sensor_emulator/lvds",
           "fpga/LVDS",
           "system_ila/probe3"
         ]
       },
       "PA_SYNC": {
         "ports": [
-          "sensor_emulator/PA_SYNC",
+          "sensor_emulator/pa_sync",
           "fpga/PA_SYNC",
           "system_ila/probe2"
         ]
@@ -1860,15 +1862,21 @@
       "RS0": {
         "ports": [
           "fpga/RS0",
-          "sensor_emulator/RS0",
+          "sensor_emulator/rs0",
           "system_ila/probe0"
         ]
       },
       "RS256": {
         "ports": [
           "fpga/RS256",
-          "sensor_emulator/RS256",
+          "sensor_emulator/rs256",
           "system_ila/probe1"
+        ]
+      },
+      "SOF": {
+        "ports": [
+          "sensor_emulator/sof",
+          "system_ila/probe4"
         ]
       },
       "source_100mhz_interconnect_aresetn": {
