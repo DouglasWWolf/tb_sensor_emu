@@ -1794,6 +1794,9 @@
           "C_NUM_OF_PROBES": {
             "value": "6"
           },
+          "C_PROBE_WIDTH_PROPAGATION": {
+            "value": "AUTO"
+          },
           "C_SLOT_0_INTF_TYPE": {
             "value": "xilinx.com:interface:axis_rtl:1.0"
           }

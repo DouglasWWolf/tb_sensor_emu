@@ -13,20 +13,20 @@ preplace port port-id_CPU_RESETN -pg 1 -lvl 0 -x 0 -y 320 -defaultsOSRD
 preplace inst system_interconnect -pg 1 -lvl 3 -x 720 -y 320 -defaultsOSRD -pinDir S00_AXI left -pinY S00_AXI 0L -pinDir M00_AXI right -pinY M00_AXI 0R -pinDir M01_AXI right -pinY M01_AXI 20R -pinDir aclk left -pinY aclk 20L -pinDir aresetn left -pinY aresetn 70L
 preplace inst source_50mhz -pg 1 -lvl 1 -x 190 -y 300 -swap {0 1 2 4 3} -defaultsOSRD -pinDir CLK100MHZ left -pinY CLK100MHZ 0L -pinDir clk_50mhz right -pinY clk_50mhz 0R -pinDir CPU_RESETN left -pinY CPU_RESETN 20L -pinBusDir interconnect_aresetn right -pinBusY interconnect_aresetn 90R -pinBusDir peripheral_aresetn right -pinBusY peripheral_aresetn 20R
 preplace inst axi_uart_bridge -pg 1 -lvl 2 -x 480 -y 240 -swap {18 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 0 19 20 22 21} -defaultsOSRD -pinDir M_AXI right -pinY M_AXI 80R -pinDir UART right -pinY UART 0R -pinDir aresetn left -pinY aresetn 80L -pinDir aclk left -pinY aclk 60L
-preplace inst sensor_emulator -pg 1 -lvl 4 -x 1030 -y 60 -swap {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 23 22 24} -defaultsOSRD -pinDir S_AXI left -pinY S_AXI 90L -pinDir resetn left -pinY resetn 110L -pinDir clk left -pinY clk 130L -pinDir rs256 right -pinY rs256 60R -pinDir pa_sync right -pinY pa_sync 80R -pinBusDir lvds right -pinBusY lvds 100R -pinDir rs0 right -pinY rs0 20R -pinDir sof right -pinY sof 0R -pinDir eof right -pinY eof 40R
-preplace inst fpga -pg 1 -lvl 4 -x 1030 -y 320 -swap {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 21 20 24 25 22 23} -defaultsOSRD -pinDir S_AXI left -pinY S_AXI 20L -pinDir clk left -pinY clk 60L -pinDir resetn left -pinY resetn 40L -pinDir PA_SYNC right -pinY PA_SYNC 40R -pinBusDir LVDS right -pinBusY LVDS 60R -pinDir RS0 right -pinY RS0 0R -pinDir RS256 right -pinY RS256 20R
-preplace inst system_ila -pg 1 -lvl 5 -x 1340 -y 60 -swap {6 1 3 4 5 0 2} -defaultsOSRD -pinDir clk left -pinY clk 120L -pinBusDir probe0 left -pinBusY probe0 20L -pinBusDir probe1 left -pinBusY probe1 60L -pinBusDir probe2 left -pinBusY probe2 80L -pinBusDir probe3 left -pinBusY probe3 100L -pinBusDir probe4 left -pinBusY probe4 0L -pinBusDir probe5 left -pinBusY probe5 40L
+preplace inst sensor_emulator -pg 1 -lvl 4 -x 1030 -y 60 -swap {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 27 26 24 23 22} -defaultsOSRD -pinDir S_AXI left -pinY S_AXI 90L -pinDir resetn left -pinY resetn 110L -pinDir clk left -pinY clk 130L -pinDir rs256 right -pinY rs256 60R -pinDir pa_sync right -pinY pa_sync 100R -pinBusDir lvds right -pinBusY lvds 80R -pinDir rs0 right -pinY rs0 40R -pinDir sof right -pinY sof 20R -pinDir eof right -pinY eof 0R
+preplace inst fpga -pg 1 -lvl 4 -x 1030 -y 320 -swap {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 21 20 25 24 22 23} -defaultsOSRD -pinDir S_AXI left -pinY S_AXI 20L -pinDir clk left -pinY clk 60L -pinDir resetn left -pinY resetn 40L -pinDir PA_SYNC right -pinY PA_SYNC 60R -pinBusDir LVDS right -pinBusY LVDS 40R -pinDir RS0 right -pinY RS0 0R -pinDir RS256 right -pinY RS256 20R
+preplace inst system_ila -pg 1 -lvl 5 -x 1340 -y 60 -swap {6 2 3 5 4 1 0} -defaultsOSRD -pinDir clk left -pinY clk 120L -pinBusDir probe0 left -pinBusY probe0 40L -pinBusDir probe1 left -pinBusY probe1 60L -pinBusDir probe2 left -pinBusY probe2 100L -pinBusDir probe3 left -pinBusY probe3 80L -pinBusDir probe4 left -pinBusY probe4 20L -pinBusDir probe5 left -pinBusY probe5 0L
 preplace netloc CLK100MHZ_1 1 0 1 NJ 300
 preplace netloc CPU_RESETN_1 1 0 1 NJ 320
-preplace netloc LVDS 1 4 1 1160 160n
-preplace netloc PA_SYNC 1 4 1 1180 140n
-preplace netloc RS0 1 4 1 1220 80n
+preplace netloc EOF 1 4 1 N 60
+preplace netloc LVDS 1 4 1 1180 140n
+preplace netloc PA_SYNC 1 4 1 1160 160n
+preplace netloc RS0 1 4 1 1220 100n
 preplace netloc RS256 1 4 1 1200 120n
-preplace netloc source_100mhz_interconnect_aresetn 1 1 2 NJ 390 N
+preplace netloc SOF 1 4 1 N 80
+preplace netloc source_100mhz_interconnect_aresetn 1 1 2 NJ 390 NJ
 preplace netloc source_100mhz_peripheral_aresetn 1 1 3 380 180 NJ 180 880
 preplace netloc system_clock_clk_100mhz 1 1 4 360 370 580 260 900 260 1240
-preplace netloc SOF 1 4 1 N 60
-preplace netloc EOF 1 4 1 N 100
 preplace netloc hier_0_M_AXI 1 2 1 N 320
 preplace netloc hier_0_UART 1 2 4 NJ 240 NJ 240 NJ 240 NJ
 preplace netloc system_interconnect_M00_AXI 1 3 1 860 150n

@@ -24,12 +24,12 @@ preplace netloc PA_SYNC 1 2 1 NJ 90
 preplace netloc RS0 1 2 1 N 170
 preplace netloc RS256 1 2 1 N 190
 preplace netloc clk_1 1 0 2 20 10 380J
+preplace netloc frame_generator_EOF 1 2 1 NJ 150
+preplace netloc frame_generator_SOF 1 2 1 NJ 130
 preplace netloc resetn_1 1 0 2 40 30 360J
 preplace netloc sensor_emu_ctl_IDLE_0 1 1 1 N 190
 preplace netloc sensor_emu_ctl_IDLE_1 1 1 1 N 210
 preplace netloc sensor_emu_ctl_enable 1 1 1 N 150
-preplace netloc frame_generator_SOF 1 2 1 NJ 130
-preplace netloc frame_generator_EOF 1 2 1 NJ 150
 preplace netloc sensor_emu_ctl_frame_header 1 1 1 N 230
 preplace netloc Conn1 1 0 1 NJ 90
 preplace netloc PATTERN 1 1 1 N 90
@@ -37,7 +37,7 @@ levelinfo -pg 1 0 200 550 740
 pagesize -pg 1 -db -bbox -sgen -100 0 870 290
 ",
    "No Loops_ScaleFactor":"1.0",
-   "No Loops_TopLeft":"-346,-240",
+   "No Loops_TopLeft":"-346,-254",
    "guistr":"# # String gsaved with Nlview 7.0r4  2019-12-20 bk=1.5203 VDI=41 GEI=36 GUI=JA:10.0 TLS
 #  -string -flagsOSRD
 preplace port S_AXI -pg 1 -lvl 0 -x 0 -y 80 -defaultsOSRD

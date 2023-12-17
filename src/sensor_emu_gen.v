@@ -73,8 +73,8 @@ end
 // Our sync pulse goes out periodically
 assign pa_sync = (enable & free_timer < SYNC_PULSE_LENGTH);
 
-// We only look for "begin outputting a frame" when the free-timer is 0 ot 1
-wire frame_trigger = (rs0 | rs256) & (free_timer < 2);
+// We only look for "begin outputting a frame" when the free-timer is 0
+wire frame_trigger = (rs0 | rs256) & (free_timer == 0);
 
 // The state of our main state machine
 reg[5:0] fsm_state;
@@ -94,11 +94,11 @@ reg[LVDS_WIDTH-1:0] cell_data;
 
 // The data on the LVDS lines depends on what state we're in
 assign lvds =
-    (fsm_state == FSM_IDLE0   ) ? {64{idle_0}}                     :
-    (fsm_state == FSM_IDLE1   ) ? {64{idle_1}}                     :
-    (fsm_state == FSM_FRAME_FC) ? {frame_header, cell_data[479:0]} :
-    (fsm_state == FSM_FRAME_DC) ? cell_data                        :
-    (fsm_state == FSM_FRAME_LC) ? {cell_data[511:32], 32'h0}       : 0;
+    (fsm_state == FSM_IDLE0   ) ? {64{idle_0}}                                    :
+    (fsm_state == FSM_IDLE1   ) ? {64{idle_1}}                                    :
+    (fsm_state == FSM_FRAME_FC) ? {frame_header, {12{8'h0}}, cell_data[48*8-1:0]} :
+    (fsm_state == FSM_FRAME_DC) ? cell_data                                       :
+    (fsm_state == FSM_FRAME_LC) ? {cell_data[511:32], 32'h0}                      : 0;
 
 
 //==========================================================================
