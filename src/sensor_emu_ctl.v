@@ -205,7 +205,7 @@ module sensor_emu_ctl #
     // If this strobes high, the output-state-machine immediately goes idle
     reg hard_stop;
 
-    // If we have an active FIFO, the frame generator should can do its thing
+    // If we have an active FIFO, the frame generator can do its thing
     assign enable = (active_fifo != 0);
 
     //==========================================================================
@@ -219,6 +219,10 @@ module sensor_emu_ctl #
     //   input_value
     //   fifo_on_deck   
     //   cycles_per_frame
+    //   frame_header
+    //   idle_0
+    //   idle_1
+    //   hard_stop
     //==========================================================================
     always @(posedge clk) begin
 
