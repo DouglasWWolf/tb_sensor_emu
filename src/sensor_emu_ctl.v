@@ -257,7 +257,7 @@ module sensor_emu_ctl #
                 // Assume for the moment that the result will be OKAY
                 ashi_wresp <= OKAY;              
             
-                // Convert the byte address into a register index
+                // Examine the register index to determine which register to write to
                 case (ashi_windx)
                 
                     REG_FIFO_CTL:
@@ -397,7 +397,7 @@ module sensor_emu_ctl #
             // Assume for the moment that the result will be OKAY
             ashi_rresp <= OKAY;              
             
-            // Convert the byte address into a register index
+            // Examine the register index to determine what the user is trying to read
             case (ashi_rindx)
  
                 // Allow a read from any valid register                
