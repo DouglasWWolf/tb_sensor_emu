@@ -21,8 +21,8 @@
         "axi_uart_bridge": ""
       },
       "sensor_emulator": {
-        "sensor_emu_ctl": "",
-        "frame_generator": ""
+        "frame_generator": "",
+        "sensor_emu_ctl": ""
       },
       "fpga": "",
       "system_ila": ""
@@ -884,6 +884,167 @@
           }
         },
         "components": {
+          "frame_generator": {
+            "vlnv": "xilinx.com:module_ref:sensor_emu_gen:1.0",
+            "xci_name": "top_level_sensor_emu_gen_0_0",
+            "xci_path": "ip/top_level_sensor_emu_gen_0_0/top_level_sensor_emu_gen_0_0.xci",
+            "inst_hier_path": "sensor_emulator/frame_generator",
+            "reference_info": {
+              "ref_type": "hdl",
+              "ref_name": "sensor_emu_gen",
+              "boundary_crc": "0x0"
+            },
+            "interface_ports": {
+              "PATTERN": {
+                "mode": "Slave",
+                "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+                "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+                "parameters": {
+                  "TDATA_NUM_BYTES": {
+                    "value": "4",
+                    "value_src": "auto"
+                  },
+                  "TDEST_WIDTH": {
+                    "value": "0",
+                    "value_src": "constant"
+                  },
+                  "TID_WIDTH": {
+                    "value": "0",
+                    "value_src": "constant"
+                  },
+                  "TUSER_WIDTH": {
+                    "value": "0",
+                    "value_src": "constant"
+                  },
+                  "HAS_TREADY": {
+                    "value": "1",
+                    "value_src": "constant"
+                  },
+                  "HAS_TSTRB": {
+                    "value": "0",
+                    "value_src": "constant"
+                  },
+                  "HAS_TKEEP": {
+                    "value": "0",
+                    "value_src": "constant"
+                  },
+                  "HAS_TLAST": {
+                    "value": "0",
+                    "value_src": "constant"
+                  },
+                  "FREQ_HZ": {
+                    "value": "50000000",
+                    "value_src": "ip_prop"
+                  },
+                  "PHASE": {
+                    "value": "0.0",
+                    "value_src": "ip_prop"
+                  },
+                  "CLK_DOMAIN": {
+                    "value": "/source_50mhz/system_clock_clk_out1",
+                    "value_src": "ip_prop"
+                  }
+                },
+                "port_maps": {
+                  "TDATA": {
+                    "physical_name": "PATTERN_TDATA",
+                    "direction": "I",
+                    "left": "31",
+                    "right": "0"
+                  },
+                  "TVALID": {
+                    "physical_name": "PATTERN_TVALID",
+                    "direction": "I"
+                  },
+                  "TREADY": {
+                    "physical_name": "PATTERN_TREADY",
+                    "direction": "O"
+                  }
+                }
+              }
+            },
+            "ports": {
+              "clk": {
+                "type": "clk",
+                "direction": "I",
+                "parameters": {
+                  "ASSOCIATED_BUSIF": {
+                    "value": "PATTERN",
+                    "value_src": "constant"
+                  },
+                  "ASSOCIATED_RESET": {
+                    "value": "resetn",
+                    "value_src": "constant"
+                  },
+                  "FREQ_HZ": {
+                    "value": "50000000",
+                    "value_src": "ip_prop"
+                  },
+                  "PHASE": {
+                    "value": "0.0",
+                    "value_src": "ip_prop"
+                  },
+                  "CLK_DOMAIN": {
+                    "value": "/source_50mhz/system_clock_clk_out1",
+                    "value_src": "ip_prop"
+                  }
+                }
+              },
+              "resetn": {
+                "type": "rst",
+                "direction": "I",
+                "parameters": {
+                  "POLARITY": {
+                    "value": "ACTIVE_LOW",
+                    "value_src": "constant"
+                  }
+                }
+              },
+              "enable": {
+                "direction": "I"
+              },
+              "rs0": {
+                "direction": "I"
+              },
+              "rs256": {
+                "direction": "I"
+              },
+              "cycles_per_frame": {
+                "direction": "I",
+                "left": "31",
+                "right": "0"
+              },
+              "idle_0": {
+                "direction": "I",
+                "left": "7",
+                "right": "0"
+              },
+              "idle_1": {
+                "direction": "I",
+                "left": "7",
+                "right": "0"
+              },
+              "frame_header": {
+                "direction": "I",
+                "left": "31",
+                "right": "0"
+              },
+              "pa_sync": {
+                "direction": "O"
+              },
+              "lvds": {
+                "direction": "O",
+                "left": "511",
+                "right": "0"
+              },
+              "sof": {
+                "direction": "O"
+              },
+              "eof": {
+                "direction": "O"
+              }
+            }
+          },
           "sensor_emu_ctl": {
             "vlnv": "xilinx.com:module_ref:sensor_emu_ctl:1.0",
             "xci_name": "top_level_sensor_emu_ctl_0_0",
@@ -1239,167 +1400,6 @@
                 "right": "0"
               }
             }
-          },
-          "frame_generator": {
-            "vlnv": "xilinx.com:module_ref:sensor_emu_gen:1.0",
-            "xci_name": "top_level_sensor_emu_gen_0_0",
-            "xci_path": "ip/top_level_sensor_emu_gen_0_0/top_level_sensor_emu_gen_0_0.xci",
-            "inst_hier_path": "sensor_emulator/frame_generator",
-            "reference_info": {
-              "ref_type": "hdl",
-              "ref_name": "sensor_emu_gen",
-              "boundary_crc": "0x0"
-            },
-            "interface_ports": {
-              "PATTERN": {
-                "mode": "Slave",
-                "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
-                "vlnv": "xilinx.com:interface:axis_rtl:1.0",
-                "parameters": {
-                  "TDATA_NUM_BYTES": {
-                    "value": "4",
-                    "value_src": "auto"
-                  },
-                  "TDEST_WIDTH": {
-                    "value": "0",
-                    "value_src": "constant"
-                  },
-                  "TID_WIDTH": {
-                    "value": "0",
-                    "value_src": "constant"
-                  },
-                  "TUSER_WIDTH": {
-                    "value": "0",
-                    "value_src": "constant"
-                  },
-                  "HAS_TREADY": {
-                    "value": "1",
-                    "value_src": "constant"
-                  },
-                  "HAS_TSTRB": {
-                    "value": "0",
-                    "value_src": "constant"
-                  },
-                  "HAS_TKEEP": {
-                    "value": "0",
-                    "value_src": "constant"
-                  },
-                  "HAS_TLAST": {
-                    "value": "0",
-                    "value_src": "constant"
-                  },
-                  "FREQ_HZ": {
-                    "value": "50000000",
-                    "value_src": "ip_prop"
-                  },
-                  "PHASE": {
-                    "value": "0.0",
-                    "value_src": "ip_prop"
-                  },
-                  "CLK_DOMAIN": {
-                    "value": "/source_50mhz/system_clock_clk_out1",
-                    "value_src": "ip_prop"
-                  }
-                },
-                "port_maps": {
-                  "TDATA": {
-                    "physical_name": "PATTERN_TDATA",
-                    "direction": "I",
-                    "left": "31",
-                    "right": "0"
-                  },
-                  "TVALID": {
-                    "physical_name": "PATTERN_TVALID",
-                    "direction": "I"
-                  },
-                  "TREADY": {
-                    "physical_name": "PATTERN_TREADY",
-                    "direction": "O"
-                  }
-                }
-              }
-            },
-            "ports": {
-              "clk": {
-                "type": "clk",
-                "direction": "I",
-                "parameters": {
-                  "ASSOCIATED_BUSIF": {
-                    "value": "PATTERN",
-                    "value_src": "constant"
-                  },
-                  "ASSOCIATED_RESET": {
-                    "value": "resetn",
-                    "value_src": "constant"
-                  },
-                  "FREQ_HZ": {
-                    "value": "50000000",
-                    "value_src": "ip_prop"
-                  },
-                  "PHASE": {
-                    "value": "0.0",
-                    "value_src": "ip_prop"
-                  },
-                  "CLK_DOMAIN": {
-                    "value": "/source_50mhz/system_clock_clk_out1",
-                    "value_src": "ip_prop"
-                  }
-                }
-              },
-              "resetn": {
-                "type": "rst",
-                "direction": "I",
-                "parameters": {
-                  "POLARITY": {
-                    "value": "ACTIVE_LOW",
-                    "value_src": "constant"
-                  }
-                }
-              },
-              "enable": {
-                "direction": "I"
-              },
-              "rs0": {
-                "direction": "I"
-              },
-              "rs256": {
-                "direction": "I"
-              },
-              "cycles_per_frame": {
-                "direction": "I",
-                "left": "31",
-                "right": "0"
-              },
-              "idle_0": {
-                "direction": "I",
-                "left": "7",
-                "right": "0"
-              },
-              "idle_1": {
-                "direction": "I",
-                "left": "7",
-                "right": "0"
-              },
-              "frame_header": {
-                "direction": "I",
-                "left": "31",
-                "right": "0"
-              },
-              "pa_sync": {
-                "direction": "O"
-              },
-              "lvds": {
-                "direction": "O",
-                "left": "511",
-                "right": "0"
-              },
-              "sof": {
-                "direction": "O"
-              },
-              "eof": {
-                "direction": "O"
-              }
-            }
           }
         },
         "interface_nets": {
@@ -1450,8 +1450,8 @@
           "clk_1": {
             "ports": [
               "clk",
-              "sensor_emu_ctl/clk",
-              "frame_generator/clk"
+              "frame_generator/clk",
+              "sensor_emu_ctl/clk"
             ]
           },
           "frame_generator_EOF": {
@@ -1469,8 +1469,8 @@
           "resetn_1": {
             "ports": [
               "resetn",
-              "sensor_emu_ctl/resetn",
-              "frame_generator/resetn"
+              "frame_generator/resetn",
+              "sensor_emu_ctl/resetn"
             ]
           },
           "sensor_emu_ctl_IDLE_0": {

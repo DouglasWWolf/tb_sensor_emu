@@ -12,7 +12,7 @@
     in a FIFO.   There are two input FIFOs, and only one at a time can be streaming out
     its contents.
 
-    Whenever a byte is extracted from a FIFO it is written back into that FIFO so that
+    Whenever an entry is extracted from a FIFO it is written back into that FIFO so that
     the vector of values in the FIFO can be re-used in a continuous loop.
 */
 
@@ -81,22 +81,23 @@ module sensor_emu_ctl #
     localparam MODULE_VERSION = 1;
 
     //=========================  AXI Register Map  =============================
-    localparam REG_MODULE_REV = 0;        /*  RO   */
-    localparam REG_FIFO_CTL = 1;
+    localparam REG_MODULE_REV       = 0;  /*  RO   */
+    localparam REG_FIFO_CTL         = 1;
         localparam BIT_F0_RESET = 0;      /*  R/W  */
         localparam BIT_F1_RESET = 1;      /*  R/W  */
         localparam BIT_F0_LOAD  = 2;      /*  WO   */
         localparam BIT_F1_LOAD  = 3;      /*  WO   */
-    localparam REG_LOAD_F0 = 2;           /*  R/W  */
-    localparam REG_LOAD_F1 = 3;           /*  R/W  */
+    localparam REG_LOAD_F0          = 2;  /*  R/W  */
+    localparam REG_LOAD_F1          = 3;  /*  R/W  */
     
-    localparam REG_START = 4;            
+    localparam REG_START            = 4;            
         localparam BIT_F0_START = 0;      /*  R/W  */
         localparam BIT_F1_START = 1;      /*  R/W  */
 
-    localparam REG_CYCLES_PER_FRAME = 5;  /*  R/W  */
-    localparam REG_IDLE_VALUES  = 6;      /*  R/W  */
-    localparam REG_FRAME_HEADER = 7;      /*  R/W  */
+    localparam REG_HARD_STOP        = 5;  /*  R/W  */
+    localparam REG_CYCLES_PER_FRAME = 6;  /*  R/W  */
+    localparam REG_IDLE_VALUES      = 7;  /*  R/W  */
+    localparam REG_FRAME_HEADER     = 8;  /*  R/W  */
 
     localparam REG_INPUT_00 = 16;         /*  R/W  */
     localparam REG_INPUT_01 = 17;         /*  R/W  */
@@ -201,6 +202,9 @@ module sensor_emu_ctl #
     // These bits indicate which FIFO is actively outputting data
     reg[1:0] active_fifo;
 
+    // If this strobes high, the output-state-machine immediately goes idle
+    reg hard_stop;
+
     // If we have an active FIFO, the frame generator should can do its thing
     assign enable = (active_fifo != 0);
 
@@ -224,6 +228,9 @@ module sensor_emu_ctl #
 
         // When one of these bit strobes high, "input_value" is loaded into a FIFO
         fifo_load_strobe <= 0;
+
+        // This only strobes high for a single cycle at a time
+        hard_stop <= 0;
 
         // If we're in reset, initialize important registers
         if (resetn == 0) begin
@@ -311,6 +318,13 @@ module sensor_emu_ctl #
                             fifo_on_deck <= 2;
                         end
 
+                    // Allow the user to say "return the output to idle mode immediately"
+                    REG_HARD_STOP:
+                        begin
+                            fifo_on_deck <= 0;
+                            hard_stop    <= 1;
+                        end
+
                     // Allow the user to configure the number of data-cycles per packet
                     REG_CYCLES_PER_FRAME:
                         if (ashi_wdata && ~active_fifo) cycles_per_frame <= ashi_wdata;
@@ -388,6 +402,7 @@ module sensor_emu_ctl #
                 REG_LOAD_F0:          ashi_rdata <= f0_count;
                 REG_LOAD_F1:          ashi_rdata <= f1_count;
                 REG_START:            ashi_rdata <= active_fifo;
+                REG_HARD_STOP:        ashi_rdata <= 0;
                 REG_CYCLES_PER_FRAME: ashi_rdata <= cycles_per_frame;
                 REG_IDLE_VALUES:      ashi_rdata <= (idle_0 << 8) | idle_1;
                 REG_FRAME_HEADER:     ashi_rdata <= frame_header;
@@ -498,11 +513,19 @@ module sensor_emu_ctl #
             
             0:  begin
                     AXIS_OUT_TVALID <= 0;
-                    osm_state <= 1;
+                    active_fifo     <= 0;
+                    osm_state       <= 1;
                 end
                 
-            // If we're waiting for a start command or this data-cycle is a handshake on AXIS_OUT...
-            1:  if (AXIS_OUT_TVALID == 0 || (AXIS_OUT_TVALID & AXIS_OUT_TREADY)) begin
+
+            1:  // If we've been told to return to idle...               
+                if (hard_stop) begin
+                    AXIS_OUT_TVALID <= 0;
+                    active_fifo     <= 0;
+                end 
+
+                // If we're waiting for a start command or this data-cycle is a handshake on AXIS_OUT...
+                else if (AXIS_OUT_TVALID == 0 || (AXIS_OUT_TVALID & AXIS_OUT_TREADY)) begin
                     
                     // Don't forget that this doesn't take effect until the end of the cycle!
                     osm_counter <= osm_counter - 1;
