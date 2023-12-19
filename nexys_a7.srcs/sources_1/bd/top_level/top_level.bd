@@ -1261,9 +1261,6 @@
                     "value_src": "constant"
                   }
                 }
-              },
-              "enable": {
-                "direction": "O"
               }
             }
           },
@@ -1382,9 +1379,6 @@
                     "value_src": "constant"
                   }
                 }
-              },
-              "enable": {
-                "direction": "I"
               },
               "rs0": {
                 "direction": "I"
@@ -1516,12 +1510,6 @@
               "resetn",
               "sensor_emu_ctl/resetn",
               "frame_generator/resetn"
-            ]
-          },
-          "sensor_emu_ctl_enable": {
-            "ports": [
-              "sensor_emu_ctl/enable",
-              "frame_generator/enable"
             ]
           }
         }

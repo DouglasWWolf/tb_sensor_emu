@@ -25,9 +25,6 @@ module sensor_emu_ctl #
 (
     input clk, resetn,
 
-    // Tell the frame generator that it should start running
-    output enable,
-
     //================== This is an AXI4-Lite slave interface ==================
         
     // "Specify write address"              -- Master --    -- Slave --
@@ -63,7 +60,7 @@ module sensor_emu_ctl #
 
     //=========================   The output stream   ==========================
     output [PATTERN_WIDTH-1:0] AXIS_OUT_TDATA,
-    output reg                 AXIS_OUT_TVALID,
+    output                     AXIS_OUT_TVALID,
     input                      AXIS_OUT_TREADY
     //==========================================================================
 );  
@@ -171,8 +168,8 @@ module sensor_emu_ctl #
     reg hard_stop;
 
     // If we have an active FIFO, the frame generator can do its thing
-    assign enable = (active_fifo != 0);
-
+    assign AXIS_OUT_TVALID = (active_fifo != 0);
+    
     //==========================================================================
     // This state machine handles AXI4-Lite write requests
     //
@@ -404,52 +401,45 @@ module sensor_emu_ctl #
     always @(posedge clk) begin
 
         if (resetn == 0) begin
-            osm_state       <= 0; 
-            active_fifo     <= 0;
-            AXIS_OUT_TVALID <= 0;
+            osm_state   <= 0; 
+            active_fifo <= 0;
         
         end else case(osm_state)
 
             
             0:  begin
-                    AXIS_OUT_TVALID <= 0;
-                    active_fifo     <= 0;
-                    osm_state       <= 1;
+                    active_fifo <= 0;
+                    osm_state   <= 1;
                 end
-                
-
+    
             1:  // If we've been told to return to idle...               
                 if (hard_stop) begin
-                    AXIS_OUT_TVALID <= 0;
-                    active_fifo     <= 0;
+                    active_fifo <= 0;
                 end 
 
                 // If we're waiting for a start command or this data-cycle is a handshake on AXIS_OUT...
-                else if (AXIS_OUT_TVALID == 0 || (AXIS_OUT_TVALID & AXIS_OUT_TREADY)) begin
+                else if (active_fifo == 0 || (AXIS_OUT_TVALID & AXIS_OUT_TREADY)) begin
                     
                     // Don't forget that this doesn't take effect until the end of the cycle!
                     osm_counter <= osm_counter - 1;
 
                     // If we're either waiting for a "start" or if we've output the entire FIFO already...
-                    if (AXIS_OUT_TVALID == 0 || osm_counter == 1) begin
+                    if (active_fifo == 0 || osm_counter == 1) begin
 
                         // If we've been told to start outputting from fifo_0...    
                         if (fifo_on_deck == 1) begin
-                            active_fifo     <= 1;
-                            osm_counter     <= f0_count;
-                            AXIS_OUT_TVALID <= 1;
+                            active_fifo <= 1;
+                            osm_counter <= f0_count;
                         end else
 
                         // If we've been told to start outputting from fifo_1....
                         if (fifo_on_deck == 2) begin
-                            active_fifo     <= 2;
-                            osm_counter     <= f1_count;
-                            AXIS_OUT_TVALID <= 1;
+                            active_fifo <= 2;
+                            osm_counter <= f1_count;
                         end else
 
                         begin
-                            active_fifo     <= 0;
-                            AXIS_OUT_TVALID <= 0;
+                            active_fifo <= 0;
                         end
                     end
                 end

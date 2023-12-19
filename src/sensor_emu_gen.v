@@ -42,9 +42,6 @@ module sensor_emu_gen #
 (
     input clk, resetn,
 
-    // We output our sync pulse only when this is high
-    input enable,
-
     // These both signal "start outputting a frame"
     input rs0, rs256,
 
@@ -145,8 +142,9 @@ wire[7:0] frame_cell = vector[cycle_number[4:2]];
 // This is a free-running timer
 reg[7:0] free_timer;
 
-// Our sync pulse goes out periodically
-assign pa_sync = (enable & free_timer < SYNC_PULSE_LENGTH);
+// Our sync pulse goes out periodically, but only when sensor_emu_ctl is
+// ready to supply cell data
+assign pa_sync = (PATTERN_TVALID & free_timer < SYNC_PULSE_LENGTH);
 
 // We only look for "begin outputting a frame" when the free-timer is 0
 wire frame_trigger = (rs0 | rs256) & (free_timer == 0);
