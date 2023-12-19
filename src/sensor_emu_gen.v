@@ -9,6 +9,28 @@
 
 /*
 
+    This generates frame data from N 8-bit wide input vectors.  (N is always 1, 2, 4
+    or 8).  
+
+    Frame data is output with cell interleaving.   The cell numbers for one row look 
+    like this:   (Bit 511 is on the left, bit 0 is on the right)
+    
+         Clock cycle 0:    504, 496,   488, [...]   16,    8,    0
+         Clock cycle 1:   1016, 1008, 1000, [...]  528,  520,  512
+         Clock cycle 2:   1528, 1520, 1512, [...] 1040, 1032, 1024
+         Clock cycle 3:   2040, 2032, 2024, [...] 1552, 1544, 1536
+
+         Clock cycle 4 thru 7:
+              Same as cycle 0 thru 3, but add 1 to every cell number
+        
+         Clock cycle 8 thru 11:
+              Same as cycle 0 thru 3, but add 2 to every cell number
+
+         Clock cycle 12 thru 15:
+              Same as cycle 0 thru 3, but add 3 to every cell number
+    
+         (etc, through clock cycle 31)
+
 */
 
 module sensor_emu_gen #
@@ -51,24 +73,80 @@ module sensor_emu_gen #
     //==========================================================================
 
 );
+genvar i;
+
+// The width of the LVDS bus in bytes
+localparam LVDS_BYTES = LVDS_WIDTH / 8;
+
+// How many bytes are in the data pattern?
+localparam PATTERN_BYTES = PATTERN_WIDTH / 8;
+
+// This is the number of copies of the pattern in the 8-byte "extended pattern"
+localparam EXTENDED_PATTERNS = 8 / PATTERN_BYTES;
 
 // The number of times the the input pattern will be replicated across the LVDS lines
 localparam PATTERN_REPS = LVDS_WIDTH / PATTERN_WIDTH;
 
-// This is the current cell-data pattern being output on LVDS
-reg[LVDS_WIDTH-1:0] pattern_data;
+// The number of data-cycles in the frame header
+localparam HEADER_CYCLES = 16;
 
-//==========================================================================
+// The number of data-cycles in the frame footer
+localparam FOOTER_CYCLES = 4;
+
+// This is the cycle number of the last data-cycle before the frame-data
+localparam LAST_HEADER_CYCLE = HEADER_CYCLES - 1;
+
+// This is the cycle number of the last data-cycle before the footer
+wire[31:0] last_frame_cycle = cycles_per_frame - 1 - FOOTER_CYCLES;
+
+// This is the cycle number of the last data cycle of the footer
+wire[31:0] last_footer_cycle = cycles_per_frame - 1;
+
+// This is the data-pattern, replicated until we have an 8-byte pattern
+reg[63:0] extended_pattern;
+
+// This is an array of 8 bytes.  Each element is 1 byte of extended_pattern
+wire[7:0] vector[0:7];
+
+// Each element of "vector" is a byte from the extended_pattern
+for (i=0; i<8; i=i+1) assign vector[i] = extended_pattern[8*(7-i) +: 8];
+
+// This counts data-cycles in a data-frame.  First cycle of the frame is cycle 0
+reg[31:0] cycle_number;
+
+//-----------------------------------------------------------
+// This will ensure that frame_cell is:
+//
+//    cycle_number 0 = vector[0]
+//    cycle_number 1 = vector[0]
+//    cycle_number 2 = vector[0]
+//    cycle_number 3 = vector[0]
+//
+//    cycle_number 4 = vector[1]
+//    cycle_number 5 = vector[1]
+//    cycle_number 6 = vector[1]
+//    cycle_number 7 = vector[1]
+//
+//                   ...
+//   
+//    cycle_number 28 = vector[7]
+//    cycle_number 29 = vector[7]
+//    cycle_number 30 = vector[7]
+//    cycle_number 31 = vector[7]
+//
+//    cycle_number 33 = vector[0]
+//    cycle_number 34 = vector[0]
+//    cycle_number 35 = vector[0]
+//    cycle_number 36 = vector[0]
+//  
+//               (etc)
+//
+//       
+wire[7:0] frame_cell = vector[cycle_number[4:2]];
+//-----------------------------------------------------------
+
 // This is a free-running timer
-//==========================================================================
 reg[7:0] free_timer;
-always @(posedge clk) begin
-    if (resetn == 0)
-        free_timer <= 0;
-    else
-        free_timer <= free_timer + 1;
-end
-//==========================================================================
 
 // Our sync pulse goes out periodically
 assign pa_sync = (enable & free_timer < SYNC_PULSE_LENGTH);
@@ -78,57 +156,60 @@ wire frame_trigger = (rs0 | rs256) & (free_timer == 0);
 
 // The state of our main state machine
 reg[5:0] fsm_state;
-localparam FSM_RESET     =  1;
-localparam FSM_IDLE0     =  2;
-localparam FSM_IDLE1     =  4;
-localparam FSM_FRAME_FC  =  8;
-localparam FSM_FRAME_DC  = 16;
-localparam FSM_FRAME_LC  = 32;
+localparam FSM_RESET       =  1;
+localparam FSM_IDLE0       =  2;
+localparam FSM_IDLE1       =  4;
+localparam FSM_FRAME_HDR   =  8;
+localparam FSM_FRAME_DATA  = 16;
+localparam FSM_FRAME_FTR   = 32;
 
 // Provide "start of frame" and "end of frame" markers to ease debugging
-assign sof = (fsm_state == FSM_FRAME_FC);
-assign eof = (fsm_state == FSM_FRAME_LC);
+assign sof = (fsm_state == FSM_FRAME_HDR);
+assign eof = (fsm_state == FSM_FRAME_FTR);
 
-// This is the data-pattern that represents cell data in the frame
-reg[LVDS_WIDTH-1:0] cell_data;
+// This is going to be 0x403f3e3d3c...03020100
+wire[LVDS_WIDTH-1:0] byte_numbers;
+for (i=0; i<LVDS_BYTES; i=i+1) assign byte_numbers[i*8 +: 8] = i;
 
-// The data on the LVDS lines depends on what state we're in
+// This wire contains the lvds bus values during the frame-header
+wire[LVDS_WIDTH-1:0] header_output = 
+    (cycle_number == 0) ? {LVDS_BYTES{frame_header[0*8 +: 8]}} :
+    (cycle_number == 1) ? {LVDS_BYTES{frame_header[1*8 +: 8]}} :
+    (cycle_number == 2) ? {LVDS_BYTES{frame_header[2*8 +: 8]}} :
+    (cycle_number == 3) ? {LVDS_BYTES{frame_header[3*8 +: 8]}} :
+    (cycle_number == 8) ? byte_numbers                         : 0;
+
+// The data on the lvds bus depends on what state we're in
 assign lvds =
-    (fsm_state == FSM_IDLE0   ) ? {64{idle_0}}                                    :
-    (fsm_state == FSM_IDLE1   ) ? {64{idle_1}}                                    :
-    (fsm_state == FSM_FRAME_FC) ? {frame_header, {12{8'h0}}, cell_data[48*8-1:0]} :
-    (fsm_state == FSM_FRAME_DC) ? cell_data                                       :
-    (fsm_state == FSM_FRAME_LC) ? {cell_data[511:32], 32'h0}                      : 0;
+    (fsm_state == FSM_IDLE0     ) ? {LVDS_BYTES{idle_0}}     :
+    (fsm_state == FSM_IDLE1     ) ? {LVDS_BYTES{idle_1}}     :
+    (fsm_state == FSM_FRAME_HDR ) ? header_output            :
+    (fsm_state == FSM_FRAME_DATA) ? {LVDS_BYTES{frame_cell}} : 0;
 
 
 //==========================================================================
-// This state machine manages the cycle_number and the pattern input stream
+// This is a free-running timer
 //==========================================================================
-reg[31:0] cycle_number;
 always @(posedge clk) begin
-    
-    // This strobes high for one cycle at a time
-    PATTERN_TREADY <= 0;
-
-    // Count clock cycles
-    cycle_number <= cycle_number + 1;
-
-    // If we see a valid frame trigger
-    if ((fsm_state == FSM_IDLE1 || fsm_state == FSM_FRAME_LC)) begin
-        if (frame_trigger) begin
-            cell_data      <= {PATTERN_REPS{PATTERN_TDATA}}; 
-            PATTERN_TREADY <= 1;             // Advance to the next pattern 
-            cycle_number   <= 1;             // Cycle number starts over            
-        end
-    end
-
+    if (resetn == 0)
+        free_timer <= 0;
+    else
+        free_timer <= free_timer + 1;
 end
 //==========================================================================
+
 
 //==========================================================================
 // Our main state machine - generates idle cycles and data frames
 //==========================================================================
 always @(posedge clk) begin
+
+    // This is the clock-cycle number of the current frame
+    cycle_number <= cycle_number + 1;
+
+    // This will strobe high for one cycle whenever we need to make the 
+    // next input pattern ready for fetching
+    PATTERN_TREADY <= 0;
 
     if (resetn == 0)
         fsm_state <= FSM_RESET;
@@ -146,26 +227,36 @@ always @(posedge clk) begin
         // Are we outputting the second idle byte?
         FSM_IDLE1:
             if (frame_trigger) begin
-                fsm_state <= FSM_FRAME_FC;
+                extended_pattern <= {EXTENDED_PATTERNS{PATTERN_TDATA}};                     
+                PATTERN_TREADY   <= 1;
+                cycle_number     <= 0;
+                fsm_state        <= FSM_FRAME_HDR;
             end else
-                fsm_state <= FSM_IDLE0;
+                fsm_state        <= FSM_IDLE0;
 
-        // Are we outputting the frame's first cycle?
-        FSM_FRAME_FC:
-            fsm_state <= FSM_FRAME_DC;
+        // Are we outputting the frame header?
+        FSM_FRAME_HDR:
+            if (cycle_number == LAST_HEADER_CYCLE) begin
+                fsm_state <= FSM_FRAME_DATA;
+            end
         
-        // Are we outputting a frame's ordinary data cycle?
-        FSM_FRAME_DC:
-            if (cycle_number == cycles_per_frame-1) begin
-                fsm_state  <= FSM_FRAME_LC;
+        // Are we outputting a frame's ordinary data
+        FSM_FRAME_DATA:
+            if (cycle_number == last_frame_cycle) begin
+                fsm_state  <= FSM_FRAME_FTR;
             end
 
-        // Are we outputting a frame's last cycle?
-        FSM_FRAME_LC:
-            if (frame_trigger) begin
-                fsm_state <= FSM_FRAME_FC;
-            end else
-                fsm_state <= FSM_IDLE0;
+        // Are we outputting the frame footer?
+        FSM_FRAME_FTR:
+            if (cycle_number == last_footer_cycle) begin
+                if (frame_trigger) begin
+                    extended_pattern <= {EXTENDED_PATTERNS{PATTERN_TDATA}};                     
+                    PATTERN_TREADY   <= 1;
+                    cycle_number     <= 0;
+                    fsm_state        <= FSM_FRAME_HDR;                    
+                end else
+                    fsm_state        <= FSM_IDLE0;
+            end
 
     endcase
 end

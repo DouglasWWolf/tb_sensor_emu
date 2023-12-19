@@ -19,6 +19,7 @@
 
 module sensor_emu_ctl #
 (
+    // This must be 8, 16, 32, or 64
     parameter PATTERN_WIDTH = 32    
 )
 (
@@ -63,18 +64,8 @@ module sensor_emu_ctl #
     //=========================   The output stream   ==========================
     output [PATTERN_WIDTH-1:0] AXIS_OUT_TDATA,
     output reg                 AXIS_OUT_TVALID,
-    input                      AXIS_OUT_TREADY,
+    input                      AXIS_OUT_TREADY
     //==========================================================================
-
-
-    // The number of clock cycles in a frame
-    output reg[31:0] cycles_per_frame,
-
-    // The first 32-bits of a frame header
-    output reg[31:0] frame_header,
-
-    // The two values that are output during "idle" cycles
-    output reg[7:0] idle_0, idle_1
 );  
 
     // Any time the register map of this module changes, this number should be bumped
@@ -85,36 +76,16 @@ module sensor_emu_ctl #
     localparam REG_FIFO_CTL         = 1;
         localparam BIT_F0_RESET = 0;      /*  R/W  */
         localparam BIT_F1_RESET = 1;      /*  R/W  */
-        localparam BIT_F0_LOAD  = 2;      /*  WO   */
-        localparam BIT_F1_LOAD  = 3;      /*  WO   */
-    localparam REG_LOAD_F0          = 2;  /*  R/W  */
-    localparam REG_LOAD_F1          = 3;  /*  R/W  */
     
-    localparam REG_START            = 4;            
+    localparam REG_UPPER32          = 2;  /*  R/W  */
+    localparam REG_LOAD_F0          = 3;  /*  R/W  */
+    localparam REG_LOAD_F1          = 4;  /*  R/W  */
+    
+    localparam REG_START            = 5;            
         localparam BIT_F0_START = 0;      /*  R/W  */
         localparam BIT_F1_START = 1;      /*  R/W  */
 
-    localparam REG_HARD_STOP        = 5;  /*  R/W  */
-    localparam REG_CYCLES_PER_FRAME = 6;  /*  R/W  */
-    localparam REG_IDLE_VALUES      = 7;  /*  R/W  */
-    localparam REG_FRAME_HEADER     = 8;  /*  R/W  */
-
-    localparam REG_INPUT_00 = 16;         /*  R/W  */
-    localparam REG_INPUT_01 = 17;         /*  R/W  */
-    localparam REG_INPUT_02 = 18;         /*  R/W  */
-    localparam REG_INPUT_03 = 19;         /*  R/W  */
-    localparam REG_INPUT_04 = 20;         /*  R/W  */
-    localparam REG_INPUT_05 = 21;         /*  R/W  */
-    localparam REG_INPUT_06 = 22;         /*  R/W  */
-    localparam REG_INPUT_07 = 23;         /*  R/W  */
-    localparam REG_INPUT_08 = 24;         /*  R/W  */
-    localparam REG_INPUT_09 = 25;         /*  R/W  */
-    localparam REG_INPUT_10 = 26;         /*  R/W  */
-    localparam REG_INPUT_11 = 27;         /*  R/W  */
-    localparam REG_INPUT_12 = 28;         /*  R/W  */
-    localparam REG_INPUT_13 = 29;         /*  R/W  */
-    localparam REG_INPUT_14 = 30;         /*  R/W  */
-    localparam REG_INPUT_15 = 31;         /*  R/W  */
+    localparam REG_HARD_STOP        = 6;  /*  R/W  */
     //==========================================================================
 
 
@@ -154,12 +125,6 @@ module sensor_emu_ctl #
     // (128 bytes is 32 32-bit registers)
     localparam ADDR_MASK = 7'h7F;
 
-    // Coming out of reset, these are default values for some important parameters
-    localparam DEFAULT_CYCLES_PER_FRAME = 32'h0001_0000;
-    localparam DEFAULT_FRAME_HEADER     = 32'hA1B2_C3D4;
-    localparam DEFAULT_IDLE_0           = 8'hFA;
-    localparam DEFAULT_IDLE_1           = 8'hFB;
-
     // When one of these counters is non-zero, the associated FIFO is held in reset
     reg[3:0] f0_reset_counter, f1_reset_counter;
 
@@ -190,8 +155,8 @@ module sensor_emu_ctl #
     // The number of data elements stored in each FIFO
     reg[14:0] f0_count, f1_count;
 
-    // When a FIFO is being filled, it will be filled with this bit-pattern
-    reg[511:0] input_value;
+    // This is the value that will be loaded into a FIFO
+    reg[63:0] input_value;
 
     // When one of these bits are strobed high, "input value" is loaded into that FIFO
     reg[1:0] fifo_load_strobe;
@@ -218,10 +183,6 @@ module sensor_emu_ctl #
     //   fifo_load_strobe
     //   input_value
     //   fifo_on_deck   
-    //   cycles_per_frame
-    //   frame_header
-    //   idle_0
-    //   idle_1
     //   hard_stop
     //==========================================================================
     always @(posedge clk) begin
@@ -244,10 +205,6 @@ module sensor_emu_ctl #
             f0_count         <= 0;
             f1_count         <= 0;
             fifo_on_deck     <= 0;
-            cycles_per_frame <= DEFAULT_CYCLES_PER_FRAME;
-            frame_header     <= DEFAULT_FRAME_HEADER;
-            idle_0           <= DEFAULT_IDLE_0;
-            idle_1           <= DEFAULT_IDLE_1;
 
         // If we're not in reset, and a write-request has occured...        
         end else case (ashi_write_state)
@@ -276,35 +233,27 @@ module sensor_emu_ctl #
                                 f1_reset_counter <= -1;
                                 ashi_write_state <= 1;
                             end   
-                            
-                            // If the user wants to load fifo_0...
-                            if (ashi_wdata[BIT_F0_LOAD ] && ~active_fifo[0]) begin
-                                fifo_load_strobe[0] <= 1;
-                                f0_count            <= f0_count + 1;
-                            end
-                            
-                            // If the user wants to load fifo_1...
-                            if (ashi_wdata[BIT_F1_LOAD ] && ~active_fifo[1]) begin
-                                fifo_load_strobe[1] <= 1;
-                                f1_count            <= f1_count + 1;
-                            end
                         
                         end
 
-                    // Is the user doing an "immediate" load of fifo_0?
+                    // Is the user storing the upper 32-bits of an input value?
+                    REG_UPPER32:
+                        input_value[63:32]<= ashi_wdata;
+
+                    // Is the user loading an entry into fifo_0?
                     REG_LOAD_F0:
                         if (~active_fifo[0]) begin
-                            input_value      <= ashi_wdata;
-                            fifo_load_strobe <= 1;
-                            f0_count         <= f0_count + 1;
+                            input_value[31:0] <= ashi_wdata;
+                            fifo_load_strobe  <= 1;
+                            f0_count          <= f0_count + 1;
                         end
 
-                    // Is the user doing an "immediate" load of fifo_1?
+                    // Is the user loading an entry into fifo_1?
                     REG_LOAD_F1:
                         if (~active_fifo[1]) begin
-                            input_value      <= ashi_wdata;
-                            fifo_load_strobe <= 2;
-                            f1_count         <= f1_count + 1;
+                            input_value[31:0] <= ashi_wdata;
+                            fifo_load_strobe  <= 2;
+                            f1_count          <= f1_count + 1;
                         end
 
 
@@ -328,42 +277,7 @@ module sensor_emu_ctl #
                             fifo_on_deck <= 0;
                             hard_stop    <= 1;
                         end
-
-                    // Allow the user to configure the number of data-cycles per packet
-                    REG_CYCLES_PER_FRAME:
-                        if (ashi_wdata && ~active_fifo) cycles_per_frame <= ashi_wdata;
-
-                    // Allow the user to configure the two idle-cycle bytes
-                    REG_IDLE_VALUES:
-                        if (~active_fifo) begin
-                            idle_0 <= ashi_wdata[15:8];
-                            idle_1 <= ashi_wdata[ 7:0];
-                        end                    
                     
-                    // Allow the user to configure the first 32-bit word of the frame header
-                    REG_FRAME_HEADER:
-                        if (~active_fifo) begin
-                            frame_header <= ashi_wdata;
-                        end
-
-                    // Allow the user to store values into the "input" field
-                    REG_INPUT_00:  input_value[ 0 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_01:  input_value[ 1 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_02:  input_value[ 2 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_03:  input_value[ 3 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_04:  input_value[ 4 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_05:  input_value[ 5 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_06:  input_value[ 6 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_07:  input_value[ 7 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_08:  input_value[ 8 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_09:  input_value[ 9 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_10:  input_value[10 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_11:  input_value[11 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_12:  input_value[12 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_13:  input_value[13 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_14:  input_value[14 * 32 +: 32] <= ashi_wdata;
-                    REG_INPUT_15:  input_value[15 * 32 +: 32] <= ashi_wdata;
-
                     // Writes to any other register are a decode-error
                     default: ashi_wresp <= DECERR;
                 endcase
@@ -403,29 +317,11 @@ module sensor_emu_ctl #
                 // Allow a read from any valid register                
                 REG_MODULE_REV:       ashi_rdata <= MODULE_VERSION;
                 REG_FIFO_CTL:         ashi_rdata <= {f1_reset, f0_reset};
+                REG_UPPER32:          ashi_rdata <= input_value[63:32];
                 REG_LOAD_F0:          ashi_rdata <= f0_count;
                 REG_LOAD_F1:          ashi_rdata <= f1_count;
                 REG_START:            ashi_rdata <= active_fifo;
                 REG_HARD_STOP:        ashi_rdata <= 0;
-                REG_CYCLES_PER_FRAME: ashi_rdata <= cycles_per_frame;
-                REG_IDLE_VALUES:      ashi_rdata <= (idle_0 << 8) | idle_1;
-                REG_FRAME_HEADER:     ashi_rdata <= frame_header;
-                REG_INPUT_00:         ashi_rdata <= input_value[ 0 * 32 +: 32];
-                REG_INPUT_01:         ashi_rdata <= input_value[ 1 * 32 +: 32];
-                REG_INPUT_02:         ashi_rdata <= input_value[ 2 * 32 +: 32];
-                REG_INPUT_03:         ashi_rdata <= input_value[ 3 * 32 +: 32];
-                REG_INPUT_04:         ashi_rdata <= input_value[ 4 * 32 +: 32];
-                REG_INPUT_05:         ashi_rdata <= input_value[ 5 * 32 +: 32];
-                REG_INPUT_06:         ashi_rdata <= input_value[ 6 * 32 +: 32];
-                REG_INPUT_07:         ashi_rdata <= input_value[ 7 * 32 +: 32];
-                REG_INPUT_08:         ashi_rdata <= input_value[ 8 * 32 +: 32];
-                REG_INPUT_09:         ashi_rdata <= input_value[ 9 * 32 +: 32];
-                REG_INPUT_10:         ashi_rdata <= input_value[10 * 32 +: 32];
-                REG_INPUT_11:         ashi_rdata <= input_value[11 * 32 +: 32];
-                REG_INPUT_12:         ashi_rdata <= input_value[12 * 32 +: 32];
-                REG_INPUT_13:         ashi_rdata <= input_value[13 * 32 +: 32];
-                REG_INPUT_14:         ashi_rdata <= input_value[14 * 32 +: 32];
-                REG_INPUT_15:         ashi_rdata <= input_value[15 * 32 +: 32];
 
                 // Reads of any other register are a decode-error
                 default: ashi_rresp <= DECERR;
