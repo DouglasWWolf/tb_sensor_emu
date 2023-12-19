@@ -84,9 +84,6 @@ localparam PATTERN_BYTES = PATTERN_WIDTH / 8;
 // This is the number of copies of the pattern in the 8-byte "extended pattern"
 localparam EXTENDED_PATTERNS = 8 / PATTERN_BYTES;
 
-// The number of times the the input pattern will be replicated across the LVDS lines
-localparam PATTERN_REPS = LVDS_WIDTH / PATTERN_WIDTH;
-
 // The number of data-cycles in the frame header
 localparam HEADER_CYCLES = 16;
 
