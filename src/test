@@ -15,10 +15,10 @@ axireg $FIFO0 0x99AABBCC
 axireg $FIFO0 0xDDEEFF01
 
 # Cycles per frame
-axireg $CYCLES_PER_FRAME 32
+axireg $CYCLES_PER_FRAME 256
 
 # Idle values
-axireg $IDLE_VALUES 0xAABB
+axireg $IDLE_VALUES 0xC1C2
 
 axireg $START 1
 

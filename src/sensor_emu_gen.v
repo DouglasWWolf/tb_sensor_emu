@@ -164,17 +164,17 @@ localparam FSM_FRAME_FTR   = 32;
 assign sof = (fsm_state == FSM_FRAME_HDR);
 assign eof = (fsm_state == FSM_FRAME_FTR);
 
-// This is going to be 0x403f3e3d3c...03020100
+// This is going to be 0x3f3e3d3c...03020100
 wire[LVDS_WIDTH-1:0] byte_numbers;
 for (i=0; i<LVDS_BYTES; i=i+1) assign byte_numbers[i*8 +: 8] = i;
 
 // This wire contains the lvds bus values during the frame-header
 wire[LVDS_WIDTH-1:0] header_output = 
-    (cycle_number == 0) ? {LVDS_BYTES{frame_header[0*8 +: 8]}} :
-    (cycle_number == 1) ? {LVDS_BYTES{frame_header[1*8 +: 8]}} :
-    (cycle_number == 2) ? {LVDS_BYTES{frame_header[2*8 +: 8]}} :
-    (cycle_number == 3) ? {LVDS_BYTES{frame_header[3*8 +: 8]}} :
-    (cycle_number == 8) ? byte_numbers                         : 0;
+    (cycle_number ==  0) ? {LVDS_BYTES{frame_header[0*8 +: 8]}} :
+    (cycle_number ==  1) ? {LVDS_BYTES{frame_header[1*8 +: 8]}} :
+    (cycle_number ==  2) ? {LVDS_BYTES{frame_header[2*8 +: 8]}} :
+    (cycle_number ==  3) ? {LVDS_BYTES{frame_header[3*8 +: 8]}} :
+    (cycle_number == 11) ? byte_numbers                         : 0;
 
 // The data on the lvds bus depends on what state we're in
 assign lvds =
