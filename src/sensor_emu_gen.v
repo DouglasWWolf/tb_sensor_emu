@@ -66,7 +66,7 @@ module sensor_emu_gen #
     //==================  The stream of input bit-patterns  ====================
     input[PATTERN_WIDTH-1:0] PATTERN_TDATA,
     input                    PATTERN_TVALID,
-    output reg               PATTERN_TREADY
+    output                   PATTERN_TREADY
     //==========================================================================
 
 );
@@ -181,6 +181,8 @@ assign lvds =
     (fsm_state == FSM_FRAME_HDR ) ? header_output            :
     (fsm_state == FSM_FRAME_DATA) ? {LVDS_BYTES{frame_cell}} : 0;
 
+// We ask for another incoming data pattern on the first cycle of a frame header
+assign PATTERN_TREADY = (fsm_state == FSM_FRAME_HDR) & (cycle_number == 0);
 
 //==========================================================================
 // This is a free-running timer
@@ -202,10 +204,6 @@ always @(posedge clk) begin
     // This is the clock-cycle number of the current frame
     cycle_number <= cycle_number + 1;
 
-    // This will strobe high for one cycle whenever we need to make the 
-    // next input pattern ready for fetching
-    PATTERN_TREADY <= 0;
-
     if (resetn == 0)
         fsm_state <= FSM_RESET;
 
@@ -223,7 +221,6 @@ always @(posedge clk) begin
         FSM_IDLE1:
             if (frame_trigger) begin
                 extended_pattern <= {EXTENDED_PATTERNS{PATTERN_TDATA}};                     
-                PATTERN_TREADY   <= 1;
                 cycle_number     <= 0;
                 fsm_state        <= FSM_FRAME_HDR;
             end else
@@ -235,7 +232,7 @@ always @(posedge clk) begin
                 fsm_state <= FSM_FRAME_DATA;
             end
         
-        // Are we outputting a frame's ordinary data
+        // Are we outputting a frame's ordinary data?
         FSM_FRAME_DATA:
             if (cycle_number == last_frame_cycle) begin
                 fsm_state  <= FSM_FRAME_FTR;
@@ -246,7 +243,6 @@ always @(posedge clk) begin
             if (cycle_number == last_footer_cycle) begin
                 if (frame_trigger) begin
                     extended_pattern <= {EXTENDED_PATTERNS{PATTERN_TDATA}};                     
-                    PATTERN_TREADY   <= 1;
                     cycle_number     <= 0;
                     fsm_state        <= FSM_FRAME_HDR;                    
                 end else
