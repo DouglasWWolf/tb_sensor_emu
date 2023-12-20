@@ -45,7 +45,7 @@ module sensor_emu_gen #
     // These both signal "start outputting a frame"
     input rs0, rs256,
 
-    // The number of clock cycles per data-frame.  Must be even and at least 4
+    // The number of clock cycles per data-frame.  Must be even and at least 32
     input[31:0] cycles_per_frame,
 
     // The bytes that are output during the idle pattern
