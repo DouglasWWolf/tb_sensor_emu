@@ -384,9 +384,6 @@ module sensor_emu_ctl #
     //
     // "osm" means "output state machine"
     //
-    // When reading this state machine, keep in mind that when AXIS_OUT_TVALID is low,
-    // it means we're not outputting any data to the output stream and we're waiting to
-    // be told which FIFO to output from
     //====================================================================================
     reg       osm_state;
     reg[15:0] osm_counter;
