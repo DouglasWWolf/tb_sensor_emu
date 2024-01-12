@@ -1,36 +1,52 @@
     
- SREG_MODULE_REV=0x1000
-  SREG_FIFO_STAT=0x1004
-   SREG_F0_COUNT=0x1008
-   SREG_F1_COUNT=0x100C             
-SREG_ACTIVE_FIFO=0x1010
-             
-   CREG_FIFO_CTL=0x1014
-    CREG_UPPER32=0x1018
-    CREG_LOAD_F0=0x101C
-    CREG_LOAD_F1=0x1020
-      CREG_START=0x1024
-  CREG_HARD_STOP=0x1028
+set_reg()
+{
+  reg=$((0x1000 + ($1*4)))
+  axireg $reg $2  
+}
+
+get_reg()
+{
+  reg=$((0x1000 + ($1*4)))
+  axireg $reg  
+}
+
+
+   SREG_MODULE_REV=0  
+SREG_PATTERN_WIDTH=1  
+    SREG_FIFO_STAT=2  
+     SREG_F0_COUNT=3  
+     SREG_F1_COUNT=4  
+  SREG_ACTIVE_FIFO=5
+     CREG_FIFO_CTL=7
+      CREG_UPPER32=8
+      CREG_LOAD_F0=9 
+      CREG_LOAD_F1=10  
+        CREG_START=11            
+    CREG_HARD_STOP=12 
 
 CYCLES_PER_FRAME=0x3000
      IDLE_VALUES=0x3004
     FRAME_HEADER=0x3008
 
+if [ "$1" != "load" ]; then
 
-axireg $FRAME_HEADER 0xAABBCCDD
+  axireg $FRAME_HEADER 0xAABBCCDD
 
-axireg $CREG_LOAD_F0 0x55667788
-axireg $CREG_LOAD_F0 0x99AABBCC
-axireg $CREG_LOAD_F0 0xDDEEFF01
+  set_reg $CREG_LOAD_F0 0x55667788
+  set_reg $CREG_LOAD_F0 0x99AABBCC
+  set_reg $CREG_LOAD_F0 0xDDEEFF01
 
-echo "Number of entries in FIFO_0: $(axireg $SREG_F0_COUNT)"
+  echo "Number of entries in FIFO_0: $(axireg $SREG_F0_COUNT)"
 
-# Cycles per frame
-axireg $CYCLES_PER_FRAME 256
+  # Cycles per frame
+  axireg $CYCLES_PER_FRAME 256
 
-# Idle values
-axireg $IDLE_VALUES 0xC1C2
+  # Idle values
+  axireg $IDLE_VALUES 0xC1C2
 
-axireg $CREG_START 1
+  set_reg $CREG_START 1
+fi
+
 
 

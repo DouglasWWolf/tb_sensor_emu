@@ -1195,6 +1195,22 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
+        <spirit:name>i_PATTERN_WIDTH</spirit:name>
+        <spirit:wire>
+          <spirit:direction>in</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">3</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>std_logic_vector</spirit:typeName>
+              <spirit:viewNameRef>dummy_view</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
+      </spirit:port>
+      <spirit:port>
         <spirit:name>i_FIFO_STAT_f0_reset</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>

@@ -962,6 +962,11 @@
             "direction": "O",
             "left": "1",
             "right": "0"
+          },
+          "o_PATTERN_WIDTH": {
+            "direction": "O",
+            "left": "3",
+            "right": "0"
           }
         },
         "components": {
@@ -1170,18 +1175,6 @@
                   "HAS_TLAST": {
                     "value": "0",
                     "value_src": "constant"
-                  },
-                  "FREQ_HZ": {
-                    "value": "50000000",
-                    "value_src": "ip_prop"
-                  },
-                  "PHASE": {
-                    "value": "0.0",
-                    "value_src": "ip_prop"
-                  },
-                  "CLK_DOMAIN": {
-                    "value": "/source_50mhz/system_clock_clk_out1",
-                    "value_src": "ip_prop"
                   }
                 },
                 "port_maps": {
@@ -1214,18 +1207,6 @@
                   "ASSOCIATED_RESET": {
                     "value": "resetn",
                     "value_src": "constant"
-                  },
-                  "FREQ_HZ": {
-                    "value": "50000000",
-                    "value_src": "ip_prop"
-                  },
-                  "PHASE": {
-                    "value": "0.0",
-                    "value_src": "ip_prop"
-                  },
-                  "CLK_DOMAIN": {
-                    "value": "/source_50mhz/system_clock_clk_out1",
-                    "value_src": "ip_prop"
                   }
                 }
               },
@@ -1285,6 +1266,11 @@
               "o_MODULE_REV": {
                 "direction": "O",
                 "left": "31",
+                "right": "0"
+              },
+              "o_PATTERN_WIDTH": {
+                "direction": "O",
+                "left": "3",
                 "right": "0"
               },
               "o_FIFO_STAT_f0_reset": {
@@ -1496,6 +1482,12 @@
             "ports": [
               "sensor_emu_ctl/o_MODULE_REV",
               "o_MODULE_REV"
+            ]
+          },
+          "sensor_emu_ctl_o_PATTERN_WIDTH": {
+            "ports": [
+              "sensor_emu_ctl/o_PATTERN_WIDTH",
+              "o_PATTERN_WIDTH"
             ]
           }
         }
@@ -2369,6 +2361,11 @@
             "left": "31",
             "right": "0"
           },
+          "i_PATTERN_WIDTH": {
+            "direction": "I",
+            "left": "3",
+            "right": "0"
+          },
           "i_FIFO_STAT_f0_reset": {
             "type": "rst",
             "direction": "I"
@@ -2604,6 +2601,12 @@
         "ports": [
           "sensor_emulator/o_MODULE_REV",
           "sensor_emu_ctl_axi/i_MODULE_REV"
+        ]
+      },
+      "sensor_emulator_o_PATTERN_WIDTH": {
+        "ports": [
+          "sensor_emulator/o_PATTERN_WIDTH",
+          "sensor_emu_ctl_axi/i_PATTERN_WIDTH"
         ]
       },
       "source_100mhz_interconnect_aresetn": {

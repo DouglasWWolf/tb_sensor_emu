@@ -75,6 +75,9 @@ module sensor_emu_ctl_axi
     // Module revision number
     input [31:0]  i_MODULE_REV,
 
+    // The cell-pattern width, in bytes
+    input [3:0]   i_PATTERN_WIDTH,
+
     // FIFO status (reports the status of a FIFO reset operation)
     input         i_FIFO_STAT_f0_reset,
     input         i_FIFO_STAT_f1_reset,
@@ -90,7 +93,7 @@ module sensor_emu_ctl_axi
 );  
 
     // The number of AXI register we have
-    localparam REGISTER_COUNT = 11;
+    localparam REGISTER_COUNT = 12;
 
     // 32-bit AXI accessible registers
     reg [31:0] axi_reg[0:REGISTER_COUNT-1];
@@ -106,20 +109,21 @@ module sensor_emu_ctl_axi
 
     //=========================  AXI Register Map  =============================
     localparam SREG_MODULE_REV       = 0;  
-    localparam SREG_FIFO_STAT        = 1;  
-    localparam SREG_F0_COUNT         = 2;  
-    localparam SREG_F1_COUNT         = 3;  
-    localparam SREG_ACTIVE_FIFO      = 4;  
+    localparam SREG_PATTERN_WIDTH    = 1;  
+    localparam SREG_FIFO_STAT        = 2;  
+    localparam SREG_F0_COUNT         = 3;  
+    localparam SREG_F1_COUNT         = 4;  
+    localparam SREG_ACTIVE_FIFO      = 5;
     
     // This is an alias for the first control register
-    localparam CREG_FIRST            = 5;    
+    localparam CREG_FIRST            = 6;    
         
-    localparam CREG_FIFO_CTL         = 5;   // 0x18
-    localparam CREG_UPPER32          = 6; 
-    localparam CREG_LOAD_F0          = 7; 
-    localparam CREG_LOAD_F1          = 8;  
-    localparam CREG_START            = 9;            
-    localparam CREG_HARD_STOP        = 10; 
+    localparam CREG_FIFO_CTL         = 7;   
+    localparam CREG_UPPER32          = 8; 
+    localparam CREG_LOAD_F0          = 9; 
+    localparam CREG_LOAD_F1          = 10;  
+    localparam CREG_START            = 11;            
+    localparam CREG_HARD_STOP        = 12; 
     //==========================================================================
 
 
@@ -140,16 +144,17 @@ module sensor_emu_ctl_axi
     //-------------------------------------------------------
 
 
-    //-------------------------------------------------------
+    //-----------------------------------------------------------------
     // Map registers to input ports
-    //-------------------------------------------------------
-    always @* axi_reg[SREG_MODULE_REV ]    = i_MODULE_REV;
-    always @* axi_reg[SREG_FIFO_STAT  ][0] = i_FIFO_STAT_f0_reset;
-    always @* axi_reg[SREG_FIFO_STAT  ][1] = i_FIFO_STAT_f1_reset;
-    always @* axi_reg[SREG_F0_COUNT   ]    = i_F0_COUNT;
-    always @* axi_reg[SREG_F1_COUNT   ]    = i_F1_COUNT;
-    always @* axi_reg[SREG_ACTIVE_FIFO]    = i_ACTIVE_FIFO;
-    //-------------------------------------------------------
+    //-----------------------------------------------------------------
+    always @* axi_reg[SREG_MODULE_REV   ]    = i_MODULE_REV;
+    always @* axi_reg[SREG_FIFO_STAT    ][0] = i_FIFO_STAT_f0_reset;
+    always @* axi_reg[SREG_FIFO_STAT    ][1] = i_FIFO_STAT_f1_reset;
+    always @* axi_reg[SREG_F0_COUNT     ]    = i_F0_COUNT;
+    always @* axi_reg[SREG_F1_COUNT     ]    = i_F1_COUNT;
+    always @* axi_reg[SREG_ACTIVE_FIFO  ]    = i_ACTIVE_FIFO;
+    always @* axi_reg[SREG_PATTERN_WIDTH]    = i_PATTERN_WIDTH;
+    //-----------------------------------------------------------------
 
 
     //<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>

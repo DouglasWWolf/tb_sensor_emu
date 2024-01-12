@@ -54,6 +54,9 @@ module sensor_emu_ctl #
     // Module revision number
     output [31:0]  o_MODULE_REV,
 
+    // The cell pattern width, in bytes
+    output [3:0]   o_PATTERN_WIDTH,
+
     // FIFO status (reports the status of a FIFO reset operation)
     output         o_FIFO_STAT_f0_reset,
     output         o_FIFO_STAT_f1_reset,
@@ -216,12 +219,11 @@ module sensor_emu_ctl #
 
 
 
-
-
     //==========================================================================
     // This block updates the status ports
     //==========================================================================
     assign o_MODULE_REV         = MODULE_VERSION;
+    assign o_PATTERN_WIDTH      = PATTERN_WIDTH / 8;
     assign o_FIFO_STAT_f0_reset = f0_reset;
     assign o_FIFO_STAT_f1_reset = f1_reset;
     assign o_F0_COUNT           = f0_count;
