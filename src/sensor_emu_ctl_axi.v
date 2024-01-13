@@ -93,7 +93,7 @@ module sensor_emu_ctl_axi
 );  
 
     // The number of AXI register we have
-    localparam REGISTER_COUNT = 12;
+    localparam REGISTER_COUNT = 13;
 
     // 32-bit AXI accessible registers
     reg [31:0] axi_reg[0:REGISTER_COUNT-1];

@@ -1,0 +1,67 @@
+source "registers.sh"
+
+CYCLES_PER_FRAME=0x3000
+     IDLE_VALUES=0x3004
+    FRAME_HEADER=0x3008
+
+
+axireg $FRAME_HEADER 0xAABBCCDD
+
+
+# Reset the FIFOs to make them empty
+set_reg $CREG_FIFO_CTL 3
+sleep .1
+echo "FIFO reset signal is $(get_reg SREG_FIFO_STAT))"
+
+echo "Before fifo loading..."
+echo "Number of entries in FIFO_0: $(get_reg $SREG_F0_COUNT)"
+echo "Number of entries in FIFO_1: $(get_reg $SREG_F1_COUNT)"
+
+
+set_reg $CREG_LOAD_F0 0x55667788
+set_reg $CREG_LOAD_F0 0x99AABBCC
+set_reg $CREG_LOAD_F0 0xDDEEFF01
+
+set_reg $CREG_LOAD_F1 0xa1b2c3
+set_reg $CREG_LOAD_F1 0xd4e5f6
+
+echo "After fifo loading..."
+echo "Number of entries in FIFO_0: $(get_reg $SREG_F0_COUNT)"
+echo "Number of entries in FIFO_1: $(get_reg $SREG_F1_COUNT)"
+
+# Cycles per frame
+axireg $CYCLES_PER_FRAME 256
+
+# Idle values
+axireg $IDLE_VALUES 0xC1C2
+
+# Start generating frames from the first FIFO
+set_reg $CREG_START 1
+sleep .1
+echo "Active FIFO is $(get_reg $SREG_ACTIVE_FIFO)"
+
+# Trigger rs0
+axireg 0x2000 1
+
+# Wait a bit for data to start moving
+sleep 2
+
+# Switch to the other FIFO
+echo "Switching to FIFO 2"
+set_reg $CREG_START 2
+sleep .1
+echo "Active FIFO is $(get_reg $SREG_ACTIVE_FIFO)"
+
+sleep 2
+
+# Hard stop the job
+echo "Performing hard-stop"
+axireg 0x2000 0
+set_reg $CREG_HARD_STOP 1
+sleep .1
+echo "Active FIFO is $(get_reg $SREG_ACTIVE_FIFO)"
+
+
+
+
+

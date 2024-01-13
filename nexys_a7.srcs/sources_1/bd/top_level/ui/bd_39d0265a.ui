@@ -47,10 +47,10 @@ preplace netloc sensor_emulator_o_F1_COUNT 1 4 1 N 380
 preplace netloc sensor_emulator_o_FIFO_STAT_f0_reset 1 4 1 N 320
 preplace netloc sensor_emulator_o_FIFO_STAT_f1_reset 1 4 1 N 340
 preplace netloc sensor_emulator_o_MODULE_REV 1 4 1 N 280
+preplace netloc sensor_emulator_o_PATTERN_WIDTH 1 4 1 N 300
 preplace netloc source_100mhz_interconnect_aresetn 1 1 2 NJ 460 620
 preplace netloc source_100mhz_peripheral_aresetn 1 1 5 380 480 600 680 940 680 1280 680 1800
 preplace netloc system_clock_clk_100mhz 1 1 5 360 690 580 660 900 660 1260 660 1840
-preplace netloc sensor_emulator_o_PATTERN_WIDTH 1 4 1 N 300
 preplace netloc hier_0_M_AXI 1 2 1 N 540
 preplace netloc hier_0_UART 1 2 5 NJ 640 NJ 640 N 640 N 640 N
 preplace netloc system_interconnect_M00_AXI 1 3 1 N 390
