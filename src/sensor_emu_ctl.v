@@ -57,9 +57,9 @@ module sensor_emu_ctl #
     // The cell pattern width, in bytes
     output [3:0]   o_PATTERN_WIDTH,
 
-    // FIFO status (reports the status of a FIFO reset operation)
-    output         o_FIFO_STAT_f0_reset,
-    output         o_FIFO_STAT_f1_reset,
+    // FIFO status (indicates the FIFOs are ready to accept data)
+    output         o_FIFO_STAT_f0_ready,
+    output         o_FIFO_STAT_f1_ready,
 
     // The number of entries in each FIFO
     output [31:0]  o_F0_COUNT,
@@ -224,8 +224,8 @@ module sensor_emu_ctl #
     //==========================================================================
     assign o_MODULE_REV         = MODULE_VERSION;
     assign o_PATTERN_WIDTH      = PATTERN_WIDTH / 8;
-    assign o_FIFO_STAT_f0_reset = f0_reset;
-    assign o_FIFO_STAT_f1_reset = f1_reset;
+    assign o_FIFO_STAT_f0_ready = (f0_reset == 0) & (f0in_tready == 1);
+    assign o_FIFO_STAT_f1_ready = (f1_reset == 0) & (f1in_tready == 1);
     assign o_F0_COUNT           = f0_count;
     assign o_F1_COUNT           = f1_count;
     assign o_ACTIVE_FIFO        = active_fifo;

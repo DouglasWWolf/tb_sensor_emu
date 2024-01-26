@@ -971,11 +971,11 @@
             "left": "31",
             "right": "0"
           },
-          "o_FIFO_STAT_f0_reset": {
+          "o_FIFO_STAT_f0_ready": {
             "type": "rst",
             "direction": "O"
           },
-          "o_FIFO_STAT_f1_reset": {
+          "o_FIFO_STAT_f1_ready": {
             "type": "rst",
             "direction": "O"
           },
@@ -1328,12 +1328,10 @@
                 "left": "3",
                 "right": "0"
               },
-              "o_FIFO_STAT_f0_reset": {
-                "type": "rst",
+              "o_FIFO_STAT_f0_ready": {
                 "direction": "O"
               },
-              "o_FIFO_STAT_f1_reset": {
-                "type": "rst",
+              "o_FIFO_STAT_f1_ready": {
                 "direction": "O"
               },
               "o_F0_COUNT": {
@@ -1523,14 +1521,14 @@
           },
           "sensor_emu_ctl_o_FIFO_STAT_f0_reset": {
             "ports": [
-              "sensor_emu_ctl/o_FIFO_STAT_f0_reset",
-              "o_FIFO_STAT_f0_reset"
+              "sensor_emu_ctl/o_FIFO_STAT_f0_ready",
+              "o_FIFO_STAT_f0_ready"
             ]
           },
           "sensor_emu_ctl_o_FIFO_STAT_f1_reset": {
             "ports": [
-              "sensor_emu_ctl/o_FIFO_STAT_f1_reset",
-              "o_FIFO_STAT_f1_reset"
+              "sensor_emu_ctl/o_FIFO_STAT_f1_ready",
+              "o_FIFO_STAT_f1_ready"
             ]
           },
           "sensor_emu_ctl_o_MODULE_REV": {
@@ -2453,12 +2451,10 @@
             "left": "3",
             "right": "0"
           },
-          "i_FIFO_STAT_f0_reset": {
-            "type": "rst",
+          "i_FIFO_STAT_f0_ready": {
             "direction": "I"
           },
-          "i_FIFO_STAT_f1_reset": {
-            "type": "rst",
+          "i_FIFO_STAT_f1_ready": {
             "direction": "I"
           },
           "i_F0_COUNT": {
@@ -2672,16 +2668,16 @@
           "sensor_emu_ctl_axi/i_F1_COUNT"
         ]
       },
-      "sensor_emulator_o_FIFO_STAT_f0_reset": {
+      "sensor_emulator_o_FIFO_STAT_f0_ready": {
         "ports": [
-          "sensor_emulator/o_FIFO_STAT_f0_reset",
-          "sensor_emu_ctl_axi/i_FIFO_STAT_f0_reset"
+          "sensor_emulator/o_FIFO_STAT_f0_ready",
+          "sensor_emu_ctl_axi/i_FIFO_STAT_f0_ready"
         ]
       },
-      "sensor_emulator_o_FIFO_STAT_f1_reset": {
+      "sensor_emulator_o_FIFO_STAT_f1_ready": {
         "ports": [
-          "sensor_emulator/o_FIFO_STAT_f1_reset",
-          "sensor_emu_ctl_axi/i_FIFO_STAT_f1_reset"
+          "sensor_emulator/o_FIFO_STAT_f1_ready",
+          "sensor_emu_ctl_axi/i_FIFO_STAT_f1_ready"
         ]
       },
       "sensor_emulator_o_MODULE_REV": {

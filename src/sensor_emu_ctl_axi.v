@@ -78,9 +78,9 @@ module sensor_emu_ctl_axi
     // The cell-pattern width, in bytes
     input [3:0]   i_PATTERN_WIDTH,
 
-    // FIFO status (reports the status of a FIFO reset operation)
-    input         i_FIFO_STAT_f0_reset,
-    input         i_FIFO_STAT_f1_reset,
+    // FIFO status 
+    input         i_FIFO_STAT_f0_ready,
+    input         i_FIFO_STAT_f1_ready,
 
     // The number of entries in each FIFO
     input [31:0]  i_F0_COUNT,
@@ -148,8 +148,8 @@ module sensor_emu_ctl_axi
     // Map registers to input ports
     //-----------------------------------------------------------------
     always @* axi_reg[SREG_MODULE_REV   ]    = i_MODULE_REV;
-    always @* axi_reg[SREG_FIFO_STAT    ][0] = i_FIFO_STAT_f0_reset;
-    always @* axi_reg[SREG_FIFO_STAT    ][1] = i_FIFO_STAT_f1_reset;
+    always @* axi_reg[SREG_FIFO_STAT    ][0] = i_FIFO_STAT_f0_ready;
+    always @* axi_reg[SREG_FIFO_STAT    ][1] = i_FIFO_STAT_f1_ready;
     always @* axi_reg[SREG_F0_COUNT     ]    = i_F0_COUNT;
     always @* axi_reg[SREG_F1_COUNT     ]    = i_F1_COUNT;
     always @* axi_reg[SREG_ACTIVE_FIFO  ]    = i_ACTIVE_FIFO;

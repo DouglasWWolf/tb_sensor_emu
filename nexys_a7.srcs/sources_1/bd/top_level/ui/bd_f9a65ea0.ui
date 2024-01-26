@@ -21,8 +21,8 @@ preplace port port-id_i_LOAD_F0_wstrobe -pg 1 -lvl 0 -x 0 -y 380 -defaultsOSRD
 preplace port port-id_i_LOAD_F1_wstrobe -pg 1 -lvl 0 -x 0 -y 420 -defaultsOSRD
 preplace port port-id_i_START_wstrobe -pg 1 -lvl 0 -x 0 -y 460 -defaultsOSRD
 preplace port port-id_i_HARD_STOP_wstrobe -pg 1 -lvl 0 -x 0 -y 480 -defaultsOSRD
-preplace port port-id_o_FIFO_STAT_f0_reset -pg 1 -lvl 3 -x 820 -y 280 -defaultsOSRD
-preplace port port-id_o_FIFO_STAT_f1_reset -pg 1 -lvl 3 -x 820 -y 300 -defaultsOSRD
+preplace port port-id_o_FIFO_STAT_f0_ready -pg 1 -lvl 3 -x 820 -y 300 -defaultsOSRD
+preplace port port-id_o_FIFO_STAT_f1_ready -pg 1 -lvl 3 -x 820 -y 320 -defaultsOSRD
 preplace portBus lvds -pg 1 -lvl 3 -x 820 -y 120 -defaultsOSRD
 preplace portBus cycles_per_frame -pg 1 -lvl 0 -x 0 -y 120 -defaultsOSRD
 preplace portBus idle_0 -pg 1 -lvl 0 -x 0 -y 140 -defaultsOSRD
@@ -33,12 +33,12 @@ preplace portBus i_LOAD_F0 -pg 1 -lvl 0 -x 0 -y 360 -defaultsOSRD
 preplace portBus i_LOAD_F1 -pg 1 -lvl 0 -x 0 -y 400 -defaultsOSRD
 preplace portBus i_START -pg 1 -lvl 0 -x 0 -y 440 -defaultsOSRD
 preplace portBus o_MODULE_REV -pg 1 -lvl 3 -x 820 -y 260 -defaultsOSRD
-preplace portBus o_F0_COUNT -pg 1 -lvl 3 -x 820 -y 320 -defaultsOSRD
-preplace portBus o_F1_COUNT -pg 1 -lvl 3 -x 820 -y 340 -defaultsOSRD
+preplace portBus o_F0_COUNT -pg 1 -lvl 3 -x 820 -y 340 -defaultsOSRD
+preplace portBus o_F1_COUNT -pg 1 -lvl 3 -x 820 -y 360 -defaultsOSRD
 preplace portBus o_ACTIVE_FIFO -pg 1 -lvl 3 -x 820 -y 380 -defaultsOSRD
-preplace portBus o_PATTERN_WIDTH -pg 1 -lvl 3 -x 820 -y 360 -defaultsOSRD
+preplace portBus o_PATTERN_WIDTH -pg 1 -lvl 3 -x 820 -y 280 -defaultsOSRD
 preplace inst frame_generator -pg 1 -lvl 2 -x 630 -y 60 -defaultsOSRD -pinDir PATTERN left -pinY PATTERN 0L -pinDir clk left -pinY clk 20L -pinDir resetn left -pinY resetn 40L -pinDir rs0 right -pinY rs0 0R -pinDir rs256 right -pinY rs256 20R -pinBusDir cycles_per_frame left -pinBusY cycles_per_frame 60L -pinBusDir idle_0 left -pinBusY idle_0 80L -pinBusDir idle_1 left -pinBusY idle_1 100L -pinBusDir frame_header left -pinBusY frame_header 120L -pinDir pa_sync right -pinY pa_sync 40R -pinBusDir lvds right -pinBusY lvds 60R -pinDir sof right -pinY sof 80R -pinDir eof right -pinY eof 100R
-preplace inst sensor_emu_ctl -pg 1 -lvl 1 -x 250 -y 240 -swap {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 22 18 19 20 21 23} -defaultsOSRD -pinDir AXIS_OUT right -pinY AXIS_OUT 0R -pinDir clk left -pinY clk 0L -pinDir resetn left -pinY resetn 20L -pinDir i_FIFO_CTL_f0_reset left -pinY i_FIFO_CTL_f0_reset 40L -pinDir i_FIFO_CTL_f1_reset left -pinY i_FIFO_CTL_f1_reset 60L -pinDir i_FIFO_CTL_wstrobe left -pinY i_FIFO_CTL_wstrobe 80L -pinBusDir i_UPPER32 left -pinBusY i_UPPER32 100L -pinBusDir i_LOAD_F0 left -pinBusY i_LOAD_F0 120L -pinDir i_LOAD_F0_wstrobe left -pinY i_LOAD_F0_wstrobe 140L -pinBusDir i_LOAD_F1 left -pinBusY i_LOAD_F1 160L -pinDir i_LOAD_F1_wstrobe left -pinY i_LOAD_F1_wstrobe 180L -pinBusDir i_START left -pinBusY i_START 200L -pinDir i_START_wstrobe left -pinY i_START_wstrobe 220L -pinDir i_HARD_STOP_wstrobe left -pinY i_HARD_STOP_wstrobe 240L -pinBusDir o_MODULE_REV right -pinBusY o_MODULE_REV 20R -pinBusDir o_PATTERN_WIDTH right -pinBusY o_PATTERN_WIDTH 120R -pinDir o_FIFO_STAT_f0_reset right -pinY o_FIFO_STAT_f0_reset 40R -pinDir o_FIFO_STAT_f1_reset right -pinY o_FIFO_STAT_f1_reset 60R -pinBusDir o_F0_COUNT right -pinBusY o_F0_COUNT 80R -pinBusDir o_F1_COUNT right -pinBusY o_F1_COUNT 100R -pinBusDir o_ACTIVE_FIFO right -pinBusY o_ACTIVE_FIFO 140R
+preplace inst sensor_emu_ctl -pg 1 -lvl 1 -x 250 -y 240 -defaultsOSRD -pinDir AXIS_OUT right -pinY AXIS_OUT 0R -pinDir clk left -pinY clk 0L -pinDir resetn left -pinY resetn 20L -pinDir i_FIFO_CTL_f0_reset left -pinY i_FIFO_CTL_f0_reset 40L -pinDir i_FIFO_CTL_f1_reset left -pinY i_FIFO_CTL_f1_reset 60L -pinDir i_FIFO_CTL_wstrobe left -pinY i_FIFO_CTL_wstrobe 80L -pinBusDir i_UPPER32 left -pinBusY i_UPPER32 100L -pinBusDir i_LOAD_F0 left -pinBusY i_LOAD_F0 120L -pinDir i_LOAD_F0_wstrobe left -pinY i_LOAD_F0_wstrobe 140L -pinBusDir i_LOAD_F1 left -pinBusY i_LOAD_F1 160L -pinDir i_LOAD_F1_wstrobe left -pinY i_LOAD_F1_wstrobe 180L -pinBusDir i_START left -pinBusY i_START 200L -pinDir i_START_wstrobe left -pinY i_START_wstrobe 220L -pinDir i_HARD_STOP_wstrobe left -pinY i_HARD_STOP_wstrobe 240L -pinBusDir o_MODULE_REV right -pinBusY o_MODULE_REV 20R -pinBusDir o_PATTERN_WIDTH right -pinBusY o_PATTERN_WIDTH 40R -pinDir o_FIFO_STAT_f0_ready right -pinY o_FIFO_STAT_f0_ready 60R -pinDir o_FIFO_STAT_f1_ready right -pinY o_FIFO_STAT_f1_ready 80R -pinBusDir o_F0_COUNT right -pinBusY o_F0_COUNT 100R -pinBusDir o_F1_COUNT right -pinBusY o_F1_COUNT 120R -pinBusDir o_ACTIVE_FIFO right -pinBusY o_ACTIVE_FIFO 140R
 preplace netloc LVDS 1 2 1 NJ 120
 preplace netloc PA_SYNC 1 2 1 NJ 100
 preplace netloc RS0 1 2 1 NJ 60
@@ -63,18 +63,18 @@ preplace netloc idle_0_1 1 0 2 NJ 140 NJ
 preplace netloc idle_1_1 1 0 2 NJ 160 NJ
 preplace netloc resetn_1 1 0 2 40 100 NJ
 preplace netloc sensor_emu_ctl_o_ACTIVE_FIFO 1 1 2 NJ 380 NJ
-preplace netloc sensor_emu_ctl_o_F0_COUNT 1 1 2 NJ 320 NJ
-preplace netloc sensor_emu_ctl_o_F1_COUNT 1 1 2 NJ 340 NJ
-preplace netloc sensor_emu_ctl_o_FIFO_STAT_f0_reset 1 1 2 NJ 280 NJ
-preplace netloc sensor_emu_ctl_o_FIFO_STAT_f1_reset 1 1 2 NJ 300 NJ
+preplace netloc sensor_emu_ctl_o_F0_COUNT 1 1 2 NJ 340 NJ
+preplace netloc sensor_emu_ctl_o_F1_COUNT 1 1 2 NJ 360 NJ
+preplace netloc sensor_emu_ctl_o_FIFO_STAT_f0_reset 1 1 2 NJ 300 NJ
+preplace netloc sensor_emu_ctl_o_FIFO_STAT_f1_reset 1 1 2 NJ 320 NJ
 preplace netloc sensor_emu_ctl_o_MODULE_REV 1 1 2 NJ 260 NJ
-preplace netloc sensor_emu_ctl_o_PATTERN_WIDTH 1 1 2 NJ 360 NJ
+preplace netloc sensor_emu_ctl_o_PATTERN_WIDTH 1 1 2 NJ 280 NJ
 preplace netloc sensor_emu_ctl_0_AXIS_OUT 1 1 1 460 60n
 levelinfo -pg 1 0 250 630 820
 pagesize -pg 1 -db -bbox -sgen -220 0 1050 540
 ",
-   "No Loops_ScaleFactor":"1.0",
-   "No Loops_TopLeft":"-462,-157",
+   "No Loops_ScaleFactor":"0.881652",
+   "No Loops_TopLeft":"-220,-177",
    "guistr":"# # String gsaved with Nlview 7.0r4  2019-12-20 bk=1.5203 VDI=41 GEI=36 GUI=JA:10.0 TLS
 #  -string -flagsOSRD
 preplace port S_AXI -pg 1 -lvl 0 -x 0 -y 80 -defaultsOSRD

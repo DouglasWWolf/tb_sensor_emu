@@ -11,7 +11,7 @@ axireg $FRAME_HEADER 0xAABBCCDD
 # Reset the FIFOs to make them empty
 set_reg $CREG_FIFO_CTL 3
 sleep .1
-echo "FIFO reset signal is $(get_reg SREG_FIFO_STAT))"
+echo "FIFO ready signal is $(get_reg SREG_FIFO_STAT)"
 
 echo "Before fifo loading..."
 echo "Number of entries in FIFO_0: $(get_reg $SREG_F0_COUNT)"
