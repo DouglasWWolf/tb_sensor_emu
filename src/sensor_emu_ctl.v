@@ -5,6 +5,8 @@
 //   Date     Who   Ver  Changes
 //====================================================================================
 // 25-Oct-23  DWW     1  Initial creation
+//
+// 25-Feb-24  DWW     2  Made FIFO depth configurable, with a default of 16384
 //====================================================================================
 
 /*
@@ -19,7 +21,10 @@
 module sensor_emu_ctl #
 (
     // This must be 8, 16, 32, or 64
-    parameter PATTERN_WIDTH = 32    
+    parameter PATTERN_WIDTH = 32,
+
+    // How many entries can our FIFO hold?    
+    parameter FIFO_DEPTH = 16384    
 )
 (
     input clk, resetn,
@@ -358,7 +363,7 @@ module sensor_emu_ctl #
 //====================================================================================
 xpm_fifo_axis #
 (
-   .FIFO_DEPTH(8192),              // DECIMAL
+   .FIFO_DEPTH(FIFO_DEPTH),        // DECIMAL
    .TDATA_WIDTH(PATTERN_WIDTH),    // DECIMAL
    .FIFO_MEMORY_TYPE("auto"),      // String
    .PACKET_FIFO("false"),          // String
@@ -417,7 +422,7 @@ fifo_0
 //====================================================================================
 xpm_fifo_axis # 
 (
-   .FIFO_DEPTH(8192),              // DECIMAL
+   .FIFO_DEPTH(FIFO_DEPTH),        // DECIMAL
    .TDATA_WIDTH(PATTERN_WIDTH),    // DECIMAL
    .FIFO_MEMORY_TYPE("auto"),      // String
    .PACKET_FIFO("false"),          // String
