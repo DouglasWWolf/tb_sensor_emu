@@ -58,7 +58,7 @@ module sensor_emu_gen #
     output pa_sync,
 
     // The LVDS lines are the primary output of this module
-    output[LVDS_WIDTH-1:0] lvds,
+    output reg[LVDS_WIDTH-1:0] lvds,
 
     // Denotes start-of-frame and end-of-frame
     output sof, eof,
@@ -174,12 +174,30 @@ wire[LVDS_WIDTH-1:0] header_output =
     (cycle_number ==  3) ? {LVDS_BYTES{frame_header[3*8 +: 8]}} :
     (cycle_number == 11) ? byte_numbers                         : 0;
 
+
+//=============================================================================
 // The data on the lvds bus depends on what state we're in
-assign lvds =
-    (fsm_state == FSM_IDLE0     ) ? {LVDS_BYTES{idle_0}}     :
-    (fsm_state == FSM_IDLE1     ) ? {LVDS_BYTES{idle_1}}     :
-    (fsm_state == FSM_FRAME_HDR ) ? header_output            :
-    (fsm_state == FSM_FRAME_DATA) ? {LVDS_BYTES{frame_cell}} : 0;
+//=============================================================================
+always @* begin
+    case (fsm_state)
+        FSM_IDLE0:
+            lvds = {LVDS_BYTES{idle_0}};  
+
+        FSM_IDLE1:
+            lvds = {LVDS_BYTES{idle_1}};  
+
+        FSM_FRAME_HDR:
+            lvds = header_output;
+
+        FSM_FRAME_DATA:
+            lvds = {LVDS_BYTES{frame_cell}};
+
+        default:
+            lvds = 0;
+    endcase
+end
+//=============================================================================
+
 
 // We ask for another incoming data pattern on the first cycle of a frame header
 assign PATTERN_TREADY = (fsm_state == FSM_FRAME_HDR) & (cycle_number == 0);

@@ -1276,9 +1276,8 @@ Writing a 1 to this bit position clears the receive FIFO
       <spirit:enumeration>128000</spirit:enumeration>
     </spirit:choice>
     <spirit:choice>
-      <spirit:name>choice_list_aadfdf9b</spirit:name>
+      <spirit:name>choice_list_ac75ef1e</spirit:name>
       <spirit:enumeration>Custom</spirit:enumeration>
-      <spirit:enumeration>usb_uart</spirit:enumeration>
     </spirit:choice>
   </spirit:choices>
   <spirit:description>Generic UART (Universal Asynchronous Receiver/Transmitter) for AXI Interface</spirit:description>
@@ -1333,7 +1332,7 @@ Writing a 1 to this bit position clears the receive FIFO
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>UARTLITE_BOARD_INTERFACE</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.UARTLITE_BOARD_INTERFACE" spirit:choiceRef="choice_list_aadfdf9b" spirit:order="1104">Custom</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.UARTLITE_BOARD_INTERFACE" spirit:choiceRef="choice_list_ac75ef1e" spirit:order="1104">Custom</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -1382,6 +1381,7 @@ Writing a 1 to this bit position clears the receive FIFO
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.S_AXI.WUSER_WIDTH" xilinx:valueSource="constant" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.UART.BOARD.ASSOCIATED_PARAM" xilinx:valuePermission="bd"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_BAUDRATE" xilinx:valueSource="user"/>
+        <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_S_AXI_ACLK_FREQ_HZ" xilinx:valueSource="user"/>
         <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_S_AXI_ACLK_FREQ_HZ_d" xilinx:valueSource="propagated" xilinx:valuePermission="bd_and_user"/>
       </xilinx:configElementInfos>
     </xilinx:coreExtensions>

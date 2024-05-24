@@ -5,7 +5,7 @@ CYCLES_PER_FRAME=0x3000
     FRAME_HEADER=0x3008
 
 
-axireg $FRAME_HEADER 0xAABBCCDD
+axireg $FRAME_HEADER 0x0FAAF0AA
 
 
 # Reset the FIFOs to make them empty
